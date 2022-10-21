@@ -8,11 +8,12 @@ Funkce:
 1) Po spuštění požaduje přihlášení. Údaje se nikde neukládají a použijí se pouze jednou. Další komunikace s bakaláři probíhá pomocí access tokenu.
 2) Program běží na pozadí, nepřekáží na liště a nevytěžuje systémové zdroje.
 3) První aktualizace je každý den v 7:30. Poté na konci každé vyučovací hodiny (časy jsou editovatelné ve zdrojovém kódu main.py).
-4) Rozvrh se integruje do tapety přiložené k programu. Je možné výchozí tapetu nahradit jinou.
-5) Nejlépe funguje na monitoru s FullHD rozlišení (1920x1080), ale není to podmínkou. Neměl by být problém s žádným standardním rozlišením, pokud bude použita správná tapeta.
-6) Formát rozvrhu lze měnit v CSS souboru ve složce source. Obrázek rozvrhu je screenshot html souboru, který je sestaven skriptem (soubor get_html.py).
-7) Program se nespouští sám po startu. Je možné udělat si zástupce skriptu RUN.bat na plochu nebo přidat skript do Po spuštění systému.
-8) Tapetu ve Windows lze snadno zobrazit posunutím kurzoru do pravého spodního rohu obrazovky. Není potřeba žádné z oken minimalizovat na lištu.
+4) Zvýrazňuje aktuální hodinu (hodinu následující po zrovna započaté přestávce).
+5) Rozvrh se integruje do tapety přiložené k programu. Je možné výchozí tapetu nahradit jinou.
+6) Nejlépe funguje na monitoru s FullHD rozlišení (1920x1080), ale není to podmínkou. Neměl by být problém s žádným standardním rozlišením, pokud bude použita správná tapeta.
+7) Formát rozvrhu lze měnit v CSS souboru ve složce source. Obrázek rozvrhu je screenshot html souboru, který je sestaven skriptem (soubor get_html.py).
+8) Program se nespouští sám po startu. Je možné udělat si zástupce skriptu RUN.bat na plochu nebo přidat skript do Po spuštění systému.
+9) Tapetu ve Windows lze snadno zobrazit posunutím kurzoru do pravého spodního rohu obrazovky. Není potřeba žádné z oken minimalizovat na lištu.
 
 Návod na použití:
 1) Pro fungování programu je třeba mít nainstalovaný Python ve verzi alespoň 3.10
