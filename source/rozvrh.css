@@ -1,0 +1,75 @@
+.main-grid {
+    display: grid;
+    grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px;
+    background-color: #1f4e78;
+    border-width: 2px;
+    border-color: #2f75b5;
+}
+.hours {
+    height: 30px;
+    text-align: center;
+    border: solid;
+    border-width: 1px;
+    border-color: #2f75b5;
+    background-color: #13466f;
+}
+.hours-title {
+    color: #ffe699;
+}
+.hours-time {
+    font-size: xx-small;
+    color: #ffe699;
+}
+.day {
+    padding: 5px;
+    height: 50px;
+    text-align: center;
+    border: solid;
+    border-width: 1px;
+    border-color: #2f75b5;
+    background-color: #13466f;
+}
+.day-name {
+    font-weight: bold;
+    color: #ffe699;
+}
+.day-date {
+    font-size: small;
+    color: #ffe699;
+}
+.item-0, .item-nm, .item-ch, .item-ac0, .item-acnm, .item-acch {
+    padding: 5px;
+    height: 50px;
+    text-align: center;
+    border: solid;
+    border-width: 1px;
+    border-color: #2f75b5;
+}
+.item-ch, .item-acch {
+    background-color: #3c6692;
+}
+.item-ac0, .item-acnm, .item-acch {
+    border-color: #ffe699;
+    border-radius: 10px;
+}
+.item-subj {
+    font-weight: bold;
+    color: #ffe699;
+    font-size: larger;
+}
+.item-room, .item-group {
+    font-size: smaller;
+    color: #ffe699;
+}
+.update-bar {
+    background-color: #13466f; 
+    font-size: small; 
+    color: #aaaaaa; 
+    text-align: right;
+    border-style: solid;
+    border-color: #2f75b5;
+    border-width: 1px;
+    padding-right: 10px;
+    width: 488px;
+
+}
