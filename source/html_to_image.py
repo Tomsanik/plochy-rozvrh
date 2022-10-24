@@ -8,4 +8,4 @@ def html_img(w, h):
 
     w += 10
     h += 10
-    hti.screenshot(html_file=PATH+'\\assets\\rozvrh.html', css_file=PATH+'\\source\\rozvrh.css', save_as='page.png', size=(w, h))
+    hti.screenshot(html_file=PATH+'\\assets\\rozvrh.html', css_file=PATH+'\\assets\\rozvrh.css', save_as='page.png', size=(w, h))
