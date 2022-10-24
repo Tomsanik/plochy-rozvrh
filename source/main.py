@@ -1,11 +1,12 @@
-from communtication import get_actual_timetable, get_tokens, refresh_access_token
+from communication import get_actual_timetable, get_tokens, refresh_access_token
 from gen_html import generate_html
 from html_to_image import html_img
 from wallpaper import get_set_wallpaper
-from datetime import datetime, time
+from datetime import datetime
 import threading
 import time
 from win10toast import ToastNotifier
+import sys
 
 
 def the_magic(day, hour):
@@ -18,8 +19,8 @@ def the_magic(day, hour):
 
 
 if __name__ == "__main__":
-    # args = sys.argv
-    args = ['', 'konopova', 'thnnuaz25Klet!']
+    args = sys.argv
+    # args = ['', 'konopova', 'thnnuaz25Klet!']
     if not get_tokens(args[1], args[2]):
         input("Ukončit stisknutím klávesy ENTER")
         exit()
