@@ -1,0 +1,1 @@
+pyvenv\Scripts\python.exe source\main.py %un% %ps%

@@ -1,3 +1,4 @@
+from pathlib import Path
 from PIL import Image
 import ctypes
 import os
@@ -8,7 +9,7 @@ def get_set_wallpaper(w, h):
     PATH = os.getcwd()
     wp = Image.open(PATH+'\\wallpaper.jpg')
 
-    PATH += '\\source'
+    PATH += '\\assets'
     rz = Image.open(PATH+'\\page.png')
 
     map = wp.load()
@@ -16,7 +17,6 @@ def get_set_wallpaper(w, h):
     rw, rh = rz.size
 
     # stupidly done, but works
-    # dy = rn.randint(90, 200)
     x0 = ww - rw - 20
     y0 = wh - rh - 92
 
@@ -33,5 +33,6 @@ def get_set_wallpaper(w, h):
     SPI_SETDESKWALLPAPER = 20
     
     PATH += '\\final.png'
+    print('set wp: ', PATH)
     
-    ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PATH, 3)
+    #ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PATH, 3)

@@ -6,7 +6,6 @@ from datetime import datetime, time
 import threading
 import time
 from win10toast import ToastNotifier
-import sys
 
 
 def the_magic(day, hour):
@@ -19,7 +18,8 @@ def the_magic(day, hour):
 
 
 if __name__ == "__main__":
-    args = sys.argv
+    # args = sys.argv
+    args = ['', 'konopova', 'thnnuaz25Klet!']
     if not get_tokens(args[1], args[2]):
         input("Ukončit stisknutím klávesy ENTER")
         exit()
@@ -30,16 +30,27 @@ if __name__ == "__main__":
     i = 0
     dt = 0
     while True:
+        dt = 0
         if i == 0:
             t1 = datetime.strptime(datetime.now().time().strftime("%H:%M:%S"), "%H:%M:%S")
             t2 = datetime.strptime('07:30:00', "%H:%M:%S")
 
             dt = round((t1-t2).total_seconds())
-            while dt > sleeps[i]:
-                dt += -sleeps[i]
-                i = (i+1) % len(sleeps)
+            print('dt = ', dt)
+            if dt > 0:
+                while dt > sleeps[i]:
+                    dt += -sleeps[i]
+                    i = (i+1) % len(sleeps)
         
-        dts = sleeps[i] - dt
+        thr = threading.Thread(target=the_magic, args=[datetime.now().weekday(), i])
+        thr.start()
+
+        print('i = ', i+1, '. hodina')
+        if dt < 0:
+            dts = -dt
+        else:
+            dts = sleeps[i] - dt
+        print('dts = ', dts)
         s = 'Příští obnovení za '
         dtm = dts // 60
         if dtm // 60 > 0:
@@ -48,8 +59,6 @@ if __name__ == "__main__":
             s += str(dtm % 60) + ' min '
         s += str(dts % 60) + ' s.'
         
-        thr = threading.Thread(target=the_magic, args=[datetime.now().weekday(), i])
-        thr.start()
         print('Právě je ' + datetime.now().strftime("%H:%M:%S"))
         print(s)
 
@@ -57,9 +66,9 @@ if __name__ == "__main__":
         toast.show_toast(
             "Tapeta s rozvrhem obnovena",
             s,
-            duration = 5,
+            duration=5,
             # icon_path = "icon.ico",
-            threaded = True,
+            threaded=True,
         )
 
         time.sleep(sleeps[i]-dt)

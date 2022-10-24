@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 import time
+import os
 
 max_item = 9  # neměnit
 
@@ -38,8 +39,8 @@ def generate_html(day, hour, zoom):
                 return d
         return None
     
-
-    with open('source\\rozvrh-aktualni.json', encoding='utf-8') as js:
+    PATH = os.getcwd()+'\\assets'
+    with open(PATH+'\\rozvrh-aktualni.json', encoding='utf-8') as js:
         rozvrh = json.load(js)
 
     hors = rozvrh['Hours']
@@ -141,7 +142,8 @@ def generate_html(day, hour, zoom):
     </html>'''
     html = html.format(now=time.strftime("%H:%M:%S", time.localtime()))
 
-    with open('source\\rozvrh.html', 'w' ,encoding='utf-8') as f:
+    with open(PATH+'\\rozvrh.html', 'w' ,encoding='utf-8') as f:
         f.write(html)
         f.close()
+    
     return round(zoom*10*50), round(zoom*(days_count*61.1+47.6+6))
