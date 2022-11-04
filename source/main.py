@@ -11,16 +11,16 @@ import sys
 
 def the_magic(day, hour):
     zoom = 1.28
+    max_hour = 9
     refresh_access_token()
-    get_actual_timetable()
-    w, h = generate_html(day, hour, zoom)
+    get_actual_timetable()  # day=datetime(2022, 11, 7))
+    w, h = generate_html(day, hour, max_hour, zoom)
     html_img(w, h)
     get_set_wallpaper(w, h)
 
 
 if __name__ == "__main__":
     args = sys.argv
-    # args = ['', 'konopova', 'thnnuaz25Klet!']
     if not get_tokens(args[1], args[2]):
         input("Ukončit stisknutím klávesy ENTER")
         exit()
@@ -29,7 +29,6 @@ if __name__ == "__main__":
     sleeps = [75, 55, 65, 55, 55, 55, 55, 50, 16*60 + 15]
     sleeps = [s*60 for s in sleeps]
     i = 0
-    dt = 0
     while True:
         dt = 0
         if i == 0:
@@ -46,12 +45,12 @@ if __name__ == "__main__":
         thr = threading.Thread(target=the_magic, args=[datetime.now().weekday(), i])
         thr.start()
 
-        print('i = ', i+1, '. hodina')
+        print(f'i = {i+1}. hodina')
         if dt < 0:
             dts = -dt
         else:
             dts = sleeps[i] - dt
-        print('dts = ', dts)
+        print(f'dts = {dts}')
         s = 'Příští obnovení za '
         dtm = dts // 60
         if dtm // 60 > 0:

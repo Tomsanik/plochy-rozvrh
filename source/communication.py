@@ -7,12 +7,14 @@ url_gpi = 'https://bakalari.gpisnicka.cz/bakaweb/api/'
 
 
 def get_tokens(username, password, url=url_gpi):
+    if url[-1] != '/':
+        url += '/'
     print('URL accessed: ', url)
 
     # user = input('Username: ')
     # psswd = getpass.getpass("Password: ")
     user, psswd = username, password
-    xml_string = 'client_id=ANDR&grant_type=password&username={}&password={}'.format(user, psswd)
+    xml_string = f'client_id=ANDR&grant_type=password&username={user}&password={psswd}'
     try:
         r = requests.post(url + 'login', data=xml_string, headers={'Content-Type': 'application/x-www-form-urlencoded'},
                           timeout=3)
@@ -28,12 +30,14 @@ def get_tokens(username, password, url=url_gpi):
         print("Timeout Error:", errt)
         return False
     except requests.exceptions.RequestException as err:
-        print("OOps: Something Else", err)
+        print("Oops: Something Else", err)
         return False
 
     # data = json.loads(x.text)
-    PATH = os.getcwd()
-    with open(PATH + '\\assets\\tokens.json', 'w') as file:
+    PATH = os.getcwd() + '\\assets'
+    if not os.path.exists(PATH):
+        os.mkdir(PATH)
+    with open(PATH + '\\tokens.json', 'w') as file:
         file.write(r.text)
     return True
 
@@ -43,9 +47,9 @@ def refresh_access_token(url=url_gpi):
     with open(PATH + "\\assets\\tokens.json", "r") as f:
         try:
             toks = json.load(f)
-        except:
-            get_tokens()
-            toks = json.load(f)
+        except FileNotFoundError:
+            print('No login tokens found.')
+            exit()
     xml_string = 'client_id=ANDR&grant_type=refresh_token&refresh_token={}'.format(toks['refresh_token'])
     x = requests.post(url + 'login', data=xml_string, headers={'Content-Type': 'application/x-www-form-urlencoded'})
     data = json.loads(x.text)

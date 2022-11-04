@@ -3,9 +3,8 @@ from datetime import datetime
 import time
 import os
 
-max_item = 9  # neměnit
 
-def generate_html(day, hour, zoom):
+def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
     def new_item(subj, group, room, type=''):
         add = '''               <div class="item-{ch}">
                     <div class="item-subj">{s}</div>
@@ -15,20 +14,20 @@ def generate_html(day, hour, zoom):
         add = add.format(s=subj, g=group, r=room, ch=type)
         return add
 
-    def new_hour(n:int, times:str):
+    def new_hour(n, times):
         add = '''               <div class="hours">
                     <div class="hours-title">{}</div>
                     <div class="hours-time">{}</div>
                 </div>\n'''
         add = add.format(n, times)
         return add
-    
+
     def new_day(n, date=None):
         add = '''               <div class="day">
                     <div class="day-name">{}</div>
                     <div class="day-date">{}</div>
                 </div>\n'''
-        day = ['Po', 'Út', 'St', 'Čt', 'Pá'][n-1]
+        day = ['Po', 'Út', 'St', 'Čt', 'Pá'][n - 1]
         add = add.format(day, date)
         return add
 
@@ -38,9 +37,9 @@ def generate_html(day, hour, zoom):
             if d[keyname] == val:
                 return d
         return None
-    
-    PATH = os.getcwd()+'\\assets'
-    with open(PATH+'\\rozvrh-aktualni.json', encoding='utf-8') as js:
+
+    PATH = os.getcwd() + '\\assets'
+    with open(PATH + '\\rozvrh-aktualni.json', encoding='utf-8') as js:
         rozvrh = json.load(js)
 
     hors = rozvrh['Hours']
@@ -69,8 +68,10 @@ def generate_html(day, hour, zoom):
     html += new_hour('', '')
 
     for hh in hors:
-        html += new_hour(hh['Caption'], hh['BeginTime']+'-'+hh['EndTime'])
-        if hh['Id'] == max_item+2:
+        if int(hh['Caption']) < 1:
+            continue
+        html += new_hour(hh['Caption'], hh['BeginTime'] + '-' + hh['EndTime'])
+        if hh['Id'] == max_item + 2:
             break
 
     days_count = len(days)
@@ -87,18 +88,19 @@ def generate_html(day, hour, zoom):
 
         s = ''
         i = 3
-        for i in range(3, 12, 1):
+        for i in range(3, max_item + 3, 1):
             h = val_in_dict(hodiny, i, 'HourId')
 
             type = ''
-            if (d['DayOfWeek']-1 == day) and (i-3 == hour):
-                    type = 'ac'
+            if (d['DayOfWeek'] - 1 == day) and (i - 3 == hour):
+                type = 'ac'
 
             if h is None:
                 type += '0'
                 html += new_item('', '', '', type)
                 continue
 
+            sub, rom, grp = '', '', ''
             if h['Change'] is not None:
                 type += 'ch'
                 change = h['Change']['ChangeType']
@@ -106,33 +108,39 @@ def generate_html(day, hour, zoom):
                     case 'RoomChanged':
                         ss = h['Change']['Description']
                         n1, n2 = ss.find(':'), ss.find('(')
-                        rom = ss[n1+1:n2-1]
+                        rom = ss[n1 + 1:n2 - 1]
                         sub = val_in_dict(subs, h['SubjectId'])['Abbrev']
                         grp = val_in_dict(grps, h['GroupIds'][0])['Abbrev']
                     case 'Removed':
                         rom = 'zrušeno'
                         ss = h['Change']['Description']
                         n = ss.find(',')
-                        ss = ss[n+1:]
-                        n1 = ss.find('(')+1
+                        ss = ss[n + 1:]
+                        n1 = ss.find('(') + 1
                         n2 = ss.find(',')
                         n3 = ss.find(')')
                         grp = ss[n1:n2]
-                        sub = ss[n2+1:n3]
+                        sub = ss[n2 + 1:n3]
                     case 'Added':
                         sub = val_in_dict(subs, h['SubjectId'])['Abbrev']
                         rom = val_in_dict(roms, h['RoomId'])['Abbrev']
-                        grp = val_in_dict(grps, h['GroupIds'][0])['Abbrev']  
+                        grp = val_in_dict(grps, h['GroupIds'][0])['Abbrev']
                     case 'Canceled':
-                        sub = h['Change']['TypeAbbrev']  
+                        sub = h['Change']['TypeAbbrev']
                         rom = ''
-                        grp = ''       
-            else:    
+                        grp = ''
+                    case 'Substitution':
+                        sub = val_in_dict(subs, h['SubjectId'])['Abbrev']
+                        grp = val_in_dict(grps, h['GroupIds'][0])['Abbrev']
+                        rom = val_in_dict(roms, h['RoomId'])['Abbrev']
+            else:
                 type += 'nm'
                 sub = val_in_dict(subs, h['SubjectId'])['Abbrev']
                 grp = val_in_dict(grps, h['GroupIds'][0])['Abbrev']
                 rom = val_in_dict(roms, h['RoomId'])['Abbrev']
-            
+
+            if h['Theme'] == "":
+                sub += '*'
             html += new_item(sub, grp, rom, type=type)
 
     html += '''                        </div>
@@ -142,8 +150,8 @@ def generate_html(day, hour, zoom):
     </html>'''
     html = html.format(now=time.strftime("%H:%M:%S", time.localtime()))
 
-    with open(PATH+'\\rozvrh.html', 'w' ,encoding='utf-8') as f:
+    with open(PATH + '\\rozvrh.html', 'w', encoding='utf-8') as f:
         f.write(html)
         f.close()
-    
-    return round(zoom*10*50), round(zoom*(days_count*61.1+47.6+6))
+
+    return round(zoom * 10 * 50), round(zoom * (days_count * 61.1 + 47.6 + 6))

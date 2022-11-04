@@ -1,8 +1,6 @@
-from pathlib import Path
 from PIL import Image
 import ctypes
 import os
-
 
 
 def get_set_wallpaper(w, h):
@@ -33,6 +31,6 @@ def get_set_wallpaper(w, h):
     SPI_SETDESKWALLPAPER = 20
     
     PATH += '\\final.png'
-    print('set wp: ', PATH)
+    # print('set wp: ', PATH)
     
-    #ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PATH, 3)
+    ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PATH, 3)
