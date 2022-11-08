@@ -6,6 +6,6 @@ echo.
 
 set /p un="Jmeno: "
 set /p ps="Heslo: "
-pyvenv\Scripts\python.exe source\main.py %un% %ps%
+pyvenv\Scripts\pythonw.exe source\main.py %un% %ps%
 echo Program spusten. Bezi na pozadi.
 pause
