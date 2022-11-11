@@ -73,3 +73,28 @@
     width: 488px;
 
 }
+
+.dohAB {
+    display: inline-block;
+    position: relative; 
+    top: 80px; left:100px; 
+    border-style: solid; 
+    width:auto; 
+    height: 40px;
+    text-orientation: upright;
+}
+
+.dohX {
+    font-size:xx-small; 
+    border-width: 2px;
+    border-color:#2f75b5;
+    background-color:#1f4e78;
+    color: #ffe699;
+    display: inline-block;
+    position: relative; 
+    top: 0px; left:0px; 
+    border-style: solid; 
+    width:auto;
+    transform: rotate(0deg);
+    transform-origin: 0.5 0.5 0
+}

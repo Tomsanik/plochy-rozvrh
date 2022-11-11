@@ -1,1 +1,3 @@
-pyvenv\Scripts\python.exe source\main.py %un% %ps%
+pyvenv\Scripts\python.exe pip install pipreqs
+
+source\main.py %un% %ps%

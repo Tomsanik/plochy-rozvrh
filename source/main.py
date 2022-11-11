@@ -19,6 +19,27 @@ def the_magic(day, hour):
     get_set_wallpaper(w, h)
 
 
+def dt_sec(ti, tf):
+    return round((tf - ti).total_seconds())
+
+
+def throw_notif(note):
+    toast = ToastNotifier()
+    toast.show_toast(
+        "Tapeta s rozvrhem obnovena",
+        note,
+        duration=5,
+        # icon_path = "icon.ico",
+        threaded=True,
+    )
+
+
+def update(lesson: int):
+    thr = threading.Thread(target=the_magic, args=[datetime.now().weekday(), lesson])
+    thr.start()
+    throw_notif(f'Následuje {lesson+1}. hodina')
+
+
 if __name__ == "__main__":
     args = sys.argv
     if not get_tokens(args[1], args[2]):
@@ -26,54 +47,32 @@ if __name__ == "__main__":
         exit()
     print('Úspěšně přihlášení')
     # start v 7:30
-    sleeps = [75, 55, 65, 55, 55, 55, 55, 50, 16*60 + 15]
-    sleeps = [s*60 for s in sleeps]
-    i = 0
+    utimes = ['07:30:00', '08:45:00', '09:40:00', '10:45:00',
+              '11:40:00', '12:35:00', '13:30:00', '14:25:00', '15:15:00']
+    utimes = [datetime.strptime(tt, "%H:%M:%S") for tt in utimes]
+
+    last_update = datetime(2022, 1, 1, 0, 0, 0, 0)
+    quick_sleep = 0
+    sleep_time = 10  # seconds
+
     while True:
-        dt = 0
-        if i == 0:
-            t1 = datetime.strptime(datetime.now().time().strftime("%H:%M:%S"), "%H:%M:%S")
-            t2 = datetime.strptime('07:30:00', "%H:%M:%S")
+        tnow = datetime.now()
+        print(f'Last update before {dt_sec(last_update, tnow)} s')
+        print(f'\tlast = {last_update} \n\ttnow = {tnow}')
+        for i in reversed(range(len(utimes))):
+            tupdate = datetime.combine(tnow.date(), datetime.time(utimes[i]))
+            ldt = dt_sec(last_update, tupdate)
+            dt = dt_sec(tnow, tupdate)
+            if dt * ldt < 0:
+                print(f'\tupdate = {tupdate.time()} \tdt = {dt} \tldt = {ldt}')
+                update(i)
+                last_update = tnow
+                break
+            if 0 < dt < sleep_time:
+                quick_sleep = dt + 1
 
-            dt = round((t1-t2).total_seconds())
-            print('dt = ', dt)
-            if dt > 0:
-                while dt > sleeps[i]:
-                    dt += -sleeps[i]
-                    i = (i+1) % len(sleeps)
-        
-        thr = threading.Thread(target=the_magic, args=[datetime.now().weekday(), i])
-        thr.start()
-
-        print(f'i = {i+1}. hodina')
-        if dt < 0:
-            dts = -dt
+        if quick_sleep > 0:
+            time.sleep(quick_sleep)
+            quick_sleep = 0
         else:
-            dts = sleeps[i] - dt
-        print(f'dts = {dts}')
-        s = 'Příští obnovení za '
-        dtm = dts // 60
-        if dtm // 60 > 0:
-            s += str(dtm // 60) + ' h '
-        if dtm % 60 > 0:
-            s += str(dtm % 60) + ' min '
-        s += str(dts % 60) + ' s.'
-        
-        print('Právě je ' + datetime.now().strftime("%H:%M:%S"))
-        print(s)
-
-        toast = ToastNotifier()
-        toast.show_toast(
-            "Tapeta s rozvrhem obnovena",
-            s,
-            duration=5,
-            # icon_path = "icon.ico",
-            threaded=True,
-        )
-
-        time.sleep(sleeps[i]-dt)
-        i = (i+1) % len(sleeps)
-
-        
-
-
+            time.sleep(sleep_time)
