@@ -1,12 +1,17 @@
-from communication import get_actual_timetable, get_tokens, refresh_access_token
-from gen_html import generate_html
-from html_to_image import html_img
-from wallpaper import get_set_wallpaper
+from source.communication import get_actual_timetable, get_tokens, refresh_access_token
+from source.gen_html import generate_html
+from source.html_to_image import html_img
+from source.wallpaper import get_set_wallpaper
 from datetime import datetime
 import threading
 import time
 from win10toast import ToastNotifier
-import sys
+import tkinter as tk
+from tkinter import ttk
+import pystray
+from pystray import MenuItem as item
+from PIL import Image
+import os
 
 
 def the_magic(day, hour):
@@ -19,10 +24,6 @@ def the_magic(day, hour):
     get_set_wallpaper(w, h)
 
 
-def dt_sec(ti, tf):
-    return round((tf - ti).total_seconds())
-
-
 def throw_notif(note):
     toast = ToastNotifier()
     toast.show_toast(
@@ -30,21 +31,19 @@ def throw_notif(note):
         note,
         duration=5,
         # icon_path = "icon.ico",
-        threaded=True,
-    )
+        threaded=True)
 
 
 def update(lesson: int):
-    thr = threading.Thread(target=the_magic, args=[datetime.now().weekday(), lesson])
-    thr.start()
+    thr1 = threading.Thread(target=the_magic, args=[datetime.now().weekday(), lesson])
+    thr1.start()
     throw_notif(f'Následuje {lesson+1}. hodina')
 
 
-if __name__ == "__main__":
-    args = sys.argv
-    if not get_tokens(args[1], args[2]):
-        input("Ukončit stisknutím klávesy ENTER")
-        exit()
+def run():
+    def dt_sec(ti, tf):
+        return round((tf - ti).total_seconds())
+
     print('Úspěšně přihlášení')
     # start v 7:30
     utimes = ['07:30:00', '08:45:00', '09:40:00', '10:45:00',
@@ -76,3 +75,85 @@ if __name__ == "__main__":
             quick_sleep = 0
         else:
             time.sleep(sleep_time)
+        if not RUNNING:
+            break
+
+
+def withdraw_window():
+    def quit_window(icon1, item):
+        icon1.stop()
+        root.destroy()
+
+    def show_window(icon1, item):
+        icon1.stop()
+        root.after(0, root.deiconify)
+
+    if RUNNING:
+        root.withdraw()
+        image = Image.open("source/bakalari.ico")
+        menu = (item('Quit', quit_window), item('Show', show_window))
+        icon = pystray.Icon("name", image, "title", menu)
+        icon.run()
+    else:
+        root.destroy()
+
+
+def login(event):
+    global thr, RUNNING
+    name = widgets['un_entry'].get()
+    psswd = widgets['ps_entry'].get()
+    if len(name) * len(psswd) == 0:
+        return
+    if not get_tokens(name, psswd):
+        widgets['out_label'].config(text='Přihlášení se nezdařilo')
+        return
+    widgets['out_label'].config(text='Přihlášeno!')
+    widgets['un_entry'].config(state="disabled")
+    widgets['ps_entry'].config(state="disabled")
+    login_button.config(state="disabled")
+    stop_button.config(state='enabled')
+    RUNNING = True
+    thr = threading.Thread(target=run)
+    thr.start()
+
+
+def stop(event):
+    global thr, RUNNING
+    RUNNING = False
+    thr.join()
+    thr = None
+    widgets['un_entry'].config(state="enabled")
+    widgets['ps_entry'].config(state="enabled")
+    login_button.config(state="enabled")
+    stop_button.config(state='disabled')
+
+
+if __name__ == '__main__':
+    PATH = os.getcwd()
+    if not os.path.exists(PATH + '\\source'):
+        os.chdir('../')
+    RUNNING = False
+    thr = None
+
+    root = tk.Tk()
+    root.title('Plozvrh')
+    root.geometry('350x220+500+200')
+    root.resizable(False, False)
+
+    widgets = {'un_label': ttk.Label(text='Uživatelské jméno'), 'un_entry': ttk.Entry(),
+               'ps_label': ttk.Label(text='Heslo'), 'ps_entry': ttk.Entry(show='*'), 'out_label': ttk.Label(text='')}
+
+    for wd in widgets.values():
+        wd.pack(anchor=tk.W, padx=10, pady=5, fill=tk.X)
+
+    login_button = ttk.Button(text='Přihlásit')
+    login_button.bind('<Button>', login)
+    login_button.pack(anchor=tk.W, padx=10, pady=5)
+
+    stop_button = ttk.Button(text='Ukončit')
+    stop_button.bind('<Button>', stop)
+    stop_button.pack(anchor=tk.E, padx=10, pady=5)
+    stop_button.config(state='disabled')
+
+    root.protocol('WM_DELETE_WINDOW', withdraw_window)
+    root.mainloop()

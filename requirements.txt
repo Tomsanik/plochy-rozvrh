@@ -8,3 +8,5 @@ pywin32==304
 requests==2.28.1
 urllib3==1.26.12
 win10toast==0.9
+
+pystray~=0.19.4
