@@ -80,11 +80,11 @@ def run():
 
 
 def withdraw_window():
-    def quit_window(icon1, item):
+    def quit_window(icon1, item1):
         icon1.stop()
         root.destroy()
 
-    def show_window(icon1, item):
+    def show_window(icon1, item1):
         icon1.stop()
         root.after(0, root.deiconify)
 
@@ -112,6 +112,7 @@ def login(event):
     widgets['ps_entry'].config(state="disabled")
     login_button.config(state="disabled")
     stop_button.config(state='enabled')
+    exit_button.config(text='Minimalizovat')
     RUNNING = True
     thr = threading.Thread(target=run)
     thr.start()
@@ -126,6 +127,7 @@ def stop(event):
     widgets['ps_entry'].config(state="enabled")
     login_button.config(state="enabled")
     stop_button.config(state='disabled')
+    exit_button.config(text='Ukončit')
 
 
 if __name__ == '__main__':
@@ -138,7 +140,7 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title('Plozvrh')
     root.geometry('350x220+500+200')
-    root.resizable(False, False)
+    # root.resizable(False, False)
 
     widgets = {'un_label': ttk.Label(text='Uživatelské jméno'), 'un_entry': ttk.Entry(),
                'ps_label': ttk.Label(text='Heslo'), 'ps_entry': ttk.Entry(show='*'), 'out_label': ttk.Label(text='')}
@@ -146,14 +148,22 @@ if __name__ == '__main__':
     for wd in widgets.values():
         wd.pack(anchor=tk.W, padx=10, pady=5, fill=tk.X)
 
-    login_button = ttk.Button(text='Přihlásit')
-    login_button.bind('<Button>', login)
-    login_button.pack(anchor=tk.W, padx=10, pady=5)
+    f1 = ttk.Frame()
+    f1.pack()
 
-    stop_button = ttk.Button(text='Ukončit')
+    login_button = ttk.Button(f1, text='Přihlásit')
+    login_button.bind('<Button>', login)
+
+    stop_button = ttk.Button(f1, text='Odhlásit')
     stop_button.bind('<Button>', stop)
-    stop_button.pack(anchor=tk.E, padx=10, pady=5)
     stop_button.config(state='disabled')
+
+    login_button.pack(expand=True, side=tk.LEFT)
+    stop_button.pack(expand=True, side=tk.LEFT)
+
+    exit_button = ttk.Button(f1, text='Ukončit')
+    exit_button.bind('<Button>', lambda _: withdraw_window())
+    exit_button.pack(expand=True, side=tk.RIGHT)
 
     root.protocol('WM_DELETE_WINDOW', withdraw_window)
     root.mainloop()
