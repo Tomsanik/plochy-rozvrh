@@ -10,11 +10,11 @@ def get_set_wallpaper(w, h):
     PATH += '\\assets'
     rz = Image.open(PATH+'\\page.png')
 
-    map = wp.load()
+    imgmap = wp.load()
     ww, wh = wp.size
     rw, rh = rz.size
 
-    # stupidly done, but works
+    # stupidly done, but hey, if works...
     x0 = ww - rw - 20
     y0 = wh - rh - 92
 
@@ -23,7 +23,7 @@ def get_set_wallpaper(w, h):
     # print(ww, wh)
     for x in range(w):
         for y in range(h):
-            map[x0+x, y0+y] = rz.getpixel((x+10, y+10))
+            imgmap[x0+x, y0+y] = rz.getpixel((x+10, y+10))
 
     wp.save(PATH+"\\final.png")
 

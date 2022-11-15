@@ -44,13 +44,15 @@ def get_tokens(username, password, url=url_gpi):
 
 def refresh_access_token(url=url_gpi):
     PATH = os.getcwd()
-    with open(PATH + "\\assets\\tokens.json", "r") as f:
-        try:
+    try:
+        with open(PATH + "\\assets\\tokens.json", "r") as f:
             toks = json.load(f)
-        except FileNotFoundError:
-            print('No login tokens found.')
-            exit()
-    xml_string = 'client_id=ANDR&grant_type=refresh_token&refresh_token={}'.format(toks['refresh_token'])
+    except FileNotFoundError:
+        print('No login tokens found.')
+        # start the program anew and exit current one?
+        exit()
+    rtok = toks['refresh_token']
+    xml_string = f'client_id=ANDR&grant_type=refresh_token&refresh_token={rtok}'
     x = requests.post(url + 'login', data=xml_string, headers={'Content-Type': 'application/x-www-form-urlencoded'})
     data = json.loads(x.text)
     with open(PATH + "\\assets\\tokens.json", 'w') as file:
@@ -61,9 +63,10 @@ def get_permanent_timetable(url=url_gpi):
     PATH = os.getcwd()
     with open(PATH + "\\assets\\tokens.json", "r") as f:
         toks = json.load(f)
+    rtok = toks['access_token']
     y = requests.get(url + '3/timetable/permanent',
                      headers={'Content-Type': 'application/x-www-form-urlencoded',
-                              'Authorization': 'Bearer {}'.format(toks['access_token'])})
+                              'Authorization': f'Bearer {rtok}'})
     data = json.loads(y.text)
     with open(PATH + "\\assets\\tokens.json", 'w') as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
@@ -75,9 +78,10 @@ def get_actual_timetable(url=url_gpi, day=None):
         toks = json.load(f)
     if day is None:
         day = date.today()
-    y = requests.get(url + '3/timetable/actual?date={}'.format(day),
+    rtok = toks['access_token']
+    y = requests.get(url + f'3/timetable/actual?date={day}',
                      headers={'Content-Type': 'application/x-www-form-urlencoded',
-                              'Authorization': 'Bearer {}'.format(toks['access_token'])})
+                              'Authorization': f'Bearer {rtok}'})
     data = json.loads(y.text)
     with open(PATH + '\\assets\\rozvrh-aktualni.json', 'w') as file:
         json.dump(data, file, indent=4)
