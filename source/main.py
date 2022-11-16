@@ -1,7 +1,7 @@
-from source.communication import get_actual_timetable, get_tokens, refresh_access_token
-from source.gen_html import generate_html
-from source.html_to_image import html_img
-from source.wallpaper import get_set_wallpaper
+from communication import get_actual_timetable, get_tokens, refresh_access_token
+from gen_html import generate_html
+from html_to_image import html_img
+from wallpaper import get_set_wallpaper
 from datetime import datetime
 import threading
 import time
