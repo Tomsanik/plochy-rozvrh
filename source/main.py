@@ -1,169 +1,89 @@
-from source.communication import get_actual_timetable, get_tokens, refresh_access_token
-from source.gen_html import generate_html
-from source.html_to_image import html_img
-from source.wallpaper import get_set_wallpaper
-from datetime import datetime
-import threading
-import time
-from win10toast import ToastNotifier
 import tkinter as tk
 from tkinter import ttk
-import pystray
-from pystray import MenuItem as item
+from pystray import MenuItem, Icon
 from PIL import Image
 import os
+from source.communication import get_tokens
+from magic_casting import Magic
 
 
-def the_magic(day, hour):
-    zoom = 1.28
-    max_hour = 9
-    refresh_access_token()
-    get_actual_timetable()  # day=datetime(2022, 11, 7))
-    w, h = generate_html(day, hour, max_hour, zoom)
-    html_img(w, h)
-    get_set_wallpaper(w, h)
-
-
-def throw_notif(note):
-    toast = ToastNotifier()
-    toast.show_toast(
-        "Tapeta s rozvrhem obnovena",
-        note,
-        duration=5,
-        # icon_path = "icon.ico",
-        threaded=True)
-
-
-def update(lesson: int):
-    thr1 = threading.Thread(target=the_magic, args=[datetime.now().weekday(), lesson])
-    thr1.start()
-    throw_notif(f'Následuje {lesson+1}. hodina')
-
-
-def run():
-    def dt_sec(ti, tf):
-        return round((tf - ti).total_seconds())
-
-    print('Úspěšně přihlášení')
-    # start v 7:30
-    utimes = ['07:30:00', '08:45:00', '09:40:00', '10:45:00',
-              '11:40:00', '12:35:00', '13:30:00', '14:25:00', '15:15:00']
-    utimes = [datetime.strptime(tt, "%H:%M:%S") for tt in utimes]
-
-    last_update = datetime(2022, 1, 1, 0, 0, 0, 0)
-    quick_sleep = 0
-    sleep_time = 10  # seconds
-
-    while True:
-        tnow = datetime.now()
-        print(f'Last update before {dt_sec(last_update, tnow)} s')
-        print(f'\tlast = {last_update} \n\ttnow = {tnow}')
-        for i in reversed(range(len(utimes))):
-            tupdate = datetime.combine(tnow.date(), datetime.time(utimes[i]))
-            ldt = dt_sec(last_update, tupdate)
-            dt = dt_sec(tnow, tupdate)
-            if dt * ldt < 0:
-                print(f'\tupdate = {tupdate.time()} \tdt = {dt} \tldt = {ldt}')
-                update(i)
-                last_update = tnow
-                break
-            if 0 < dt < sleep_time:
-                quick_sleep = dt + 1
-
-        if quick_sleep > 0:
-            time.sleep(quick_sleep)
-            quick_sleep = 0
-        else:
-            time.sleep(sleep_time)
-        if not RUNNING:
-            break
-
-
-def withdraw_window():
-    def quit_window(icon1, item1):
-        icon1.stop()
-        root.destroy()
-
-    def show_window(icon1, item1):
+def withdraw_window(_event=None):
+    def show_window(icon1, _item1):
         icon1.stop()
         root.after(0, root.deiconify)
 
-    if RUNNING:
+    if magic.is_running():
         root.withdraw()
         image = Image.open("source/bakalari.ico")
-        menu = (item('Quit', quit_window), item('Show', show_window))
-        icon = pystray.Icon("name", image, "title", menu)
+        menu = (MenuItem('Show', show_window, default=True, visible=False), )
+        icon = Icon("name", image, "Plozvrh", menu)
         icon.run()
     else:
         root.destroy()
 
 
-def login(event):
-    global thr, RUNNING
-    name = widgets['un_entry'].get()
-    psswd = widgets['ps_entry'].get()
+def login(_event):
+    name = widgets['en_uname'].get()
+    psswd = widgets['en_psswd'].get()
     if len(name) * len(psswd) == 0:
         return
     if not get_tokens(name, psswd):
-        widgets['out_label'].config(text='Přihlášení se nezdařilo')
+        widgets['lb_output'].config(text='Přihlášení se nezdařilo')
         return
-    widgets['out_label'].config(text='Přihlášeno!')
-    widgets['un_entry'].config(state="disabled")
-    widgets['ps_entry'].config(state="disabled")
-    login_button.config(state="disabled")
-    stop_button.config(state='enabled')
-    exit_button.config(text='Minimalizovat')
-    RUNNING = True
-    thr = threading.Thread(target=run)
-    thr.start()
+    magic.start()
+    widgets['lb_output'].config(text='Přihlášeno!')
+    widgets['en_uname'].config(state="disabled")
+    widgets['en_psswd'].config(state="disabled")
+    widgets['bt_start'].config(state="disabled")
+    widgets['bt_stop'].config(state='enabled')
+    widgets['bt_quit'].config(text='Minimalizovat')
 
 
-def stop(event):
-    global thr, RUNNING
-    RUNNING = False
-    thr.join()
-    thr = None
-    widgets['un_entry'].config(state="enabled")
-    widgets['ps_entry'].config(state="enabled")
-    login_button.config(state="enabled")
-    stop_button.config(state='disabled')
-    exit_button.config(text='Ukončit')
+def logout(_event):
+    widgets['lb_output'].config(text='Odhlašování probíhá, vyčkejte.')
+    root.update()
+    magic.stop()
+    widgets['en_uname'].config(state="enabled")
+    widgets['en_psswd'].config(state="enabled")
+    widgets['bt_start'].config(state="enabled")
+    widgets['bt_stop'].config(state='disabled')
+    widgets['bt_quit'].config(text='Ukončit')
+    widgets['lb_output'].config(text='Odhlášeno.')
 
 
 if __name__ == '__main__':
     PATH = os.getcwd()
     if not os.path.exists(PATH + '\\source'):
         os.chdir('../')
-    RUNNING = False
-    thr = None
+
+    magic = Magic()
 
     root = tk.Tk()
     root.title('Plozvrh')
+    root.iconbitmap('source\\bakalari.ico')
     root.geometry('350x220+500+200')
-    # root.resizable(False, False)
-
-    widgets = {'un_label': ttk.Label(text='Uživatelské jméno'), 'un_entry': ttk.Entry(),
-               'ps_label': ttk.Label(text='Heslo'), 'ps_entry': ttk.Entry(show='*'), 'out_label': ttk.Label(text='')}
-
-    for wd in widgets.values():
-        wd.pack(anchor=tk.W, padx=10, pady=5, fill=tk.X)
+    root.resizable(False, False)
 
     f1 = ttk.Frame()
+    widgets = {'lb_uname': ttk.Label(text='Uživatelské jméno'), 'en_uname': ttk.Entry(),
+               'lb_psswd': ttk.Label(text='Heslo'), 'en_psswd': ttk.Entry(show='*'),
+               'lb_output': ttk.Label(text=''), 'bt_start': ttk.Button(f1, text='Přihlásit'),
+               'bt_stop': ttk.Button(f1, text='Odhlásit'), 'bt_quit': ttk.Button(f1, text='Ukončit')}
+
+    for wd in ['lb_uname', 'en_uname', 'lb_psswd', 'en_psswd', 'lb_output']:
+        widgets[wd].pack(anchor=tk.W, padx=10, pady=5, fill=tk.X)
+
     f1.pack()
 
-    login_button = ttk.Button(f1, text='Přihlásit')
-    login_button.bind('<Button>', login)
+    widgets['bt_start'].bind('<Button>', login)
+    widgets['bt_start'].pack(expand=True, side=tk.LEFT)
 
-    stop_button = ttk.Button(f1, text='Odhlásit')
-    stop_button.bind('<Button>', stop)
-    stop_button.config(state='disabled')
+    widgets['bt_stop'].bind('<Button>', logout)
+    widgets['bt_stop'].config(state='disabled')
+    widgets['bt_stop'].pack(expand=True, side=tk.LEFT)
 
-    login_button.pack(expand=True, side=tk.LEFT)
-    stop_button.pack(expand=True, side=tk.LEFT)
-
-    exit_button = ttk.Button(f1, text='Ukončit')
-    exit_button.bind('<Button>', lambda _: withdraw_window())
-    exit_button.pack(expand=True, side=tk.RIGHT)
+    widgets['bt_quit'].bind('<Button>', withdraw_window)
+    widgets['bt_quit'].pack(expand=True, side=tk.RIGHT)
 
     root.protocol('WM_DELETE_WINDOW', withdraw_window)
     root.mainloop()
