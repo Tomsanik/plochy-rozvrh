@@ -3,7 +3,7 @@ from tkinter import ttk
 from pystray import MenuItem, Icon
 from PIL import Image
 import os
-from source.communication import get_tokens
+from communication import get_tokens
 from magic_casting import Magic
 
 
