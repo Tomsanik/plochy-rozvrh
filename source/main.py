@@ -1,13 +1,15 @@
+"""Easy school schedule on the wallpaper"""
+import os
 import tkinter as tk
 from tkinter import ttk
 from pystray import MenuItem, Icon
 from PIL import Image
-import os
-from source.communication import get_tokens
+from communication import get_tokens
 from magic_casting import Magic
 
 
 def withdraw_window(_event=None):
+    """Window closes to system tray if update thread is running"""
     def show_window(icon1, _item1):
         icon1.stop()
         root.after(0, root.deiconify)
@@ -23,6 +25,7 @@ def withdraw_window(_event=None):
 
 
 def login(_event):
+    """Gets tokens from server and changes UI as needed"""
     name = widgets['en_uname'].get()
     psswd = widgets['en_psswd'].get()
     if len(name) * len(psswd) == 0:
@@ -40,6 +43,7 @@ def login(_event):
 
 
 def logout(_event):
+    """Disables thread doing the updates and changes UI as needed"""
     widgets['lb_output'].config(text='Odhlašování probíhá, vyčkejte.')
     root.update()
     magic.stop()
@@ -68,7 +72,8 @@ if __name__ == '__main__':
     widgets = {'lb_uname': ttk.Label(text='Uživatelské jméno'), 'en_uname': ttk.Entry(),
                'lb_psswd': ttk.Label(text='Heslo'), 'en_psswd': ttk.Entry(show='*'),
                'lb_output': ttk.Label(text=''), 'bt_start': ttk.Button(f1, text='Přihlásit'),
-               'bt_stop': ttk.Button(f1, text='Odhlásit'), 'bt_quit': ttk.Button(f1, text='Ukončit')}
+               'bt_stop': ttk.Button(f1, text='Odhlásit'),
+               'bt_quit': ttk.Button(f1, text='Ukončit')}
 
     for wd in ['lb_uname', 'en_uname', 'lb_psswd', 'en_psswd', 'lb_output']:
         widgets[wd].pack(anchor=tk.W, padx=10, pady=5, fill=tk.X)

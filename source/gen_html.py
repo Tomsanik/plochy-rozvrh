@@ -1,3 +1,4 @@
+"""Generates HTML file"""
 import json
 from datetime import datetime
 import time
@@ -5,13 +6,14 @@ import os
 
 
 def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
-    def new_item(subj, group, room, type=''):
+    """All the magic in one def"""
+    def new_item(subj, group, room, typ=''):
         add = '''               <div class="item-{ch}">
                     <div class="item-subj">{s}</div>
                     <div class="item-group">{g}</div>
                     <div class="item-room">{r}</div>
                 </div>\n'''
-        add = add.format(s=subj, g=group, r=room, ch=type)
+        add = add.format(s=subj, g=group, r=room, ch=typ)
         return add
 
     def new_hour(n, times):
@@ -32,7 +34,7 @@ def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
         return add
 
     def val_in_dict(lst, val, keyname='Id'):
-        # returns item of dictionary with given keyname of given value 
+        # returns item of dictionary with given keyname of given value
         for d in lst:
             if d[keyname] == val:
                 return d
@@ -86,23 +88,22 @@ def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
         dt = datetime.strptime(d['Date'][:nt], '%Y-%m-%d')
         html += new_day(d['DayOfWeek'], dt.strftime('%d. %m'))
 
-        s = ''
         i = 3
         for i in range(3, max_item + 3, 1):
             h = val_in_dict(hodiny, i, 'HourId')
 
-            type = ''
+            typ = ''
             if (d['DayOfWeek'] - 1 == day) and (i - 3 == hour):
-                type = 'ac'
+                typ = 'ac'
 
             if h is None:
-                type += '0'
-                html += new_item('', '', '', type)
+                typ += '0'
+                html += new_item('', '', '', typ)
                 continue
 
             sub, rom, grp = '', '', ''
             if h['Change'] is not None:
-                type += 'ch'
+                typ += 'ch'
                 change = h['Change']['ChangeType']
                 match change:
                     case 'RoomChanged':
@@ -134,14 +135,14 @@ def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
                         grp = val_in_dict(grps, h['GroupIds'][0])['Abbrev']
                         rom = val_in_dict(roms, h['RoomId'])['Abbrev']
             else:
-                type += 'nm'
+                typ += 'nm'
                 sub = val_in_dict(subs, h['SubjectId'])['Abbrev']
                 grp = val_in_dict(grps, h['GroupIds'][0])['Abbrev']
                 rom = val_in_dict(roms, h['RoomId'])['Abbrev']
 
             if h['Theme'] == "":
                 sub += '*'
-            html += new_item(sub, grp, rom, type=type)
+            html += new_item(sub, grp, rom, typ=typ)
 
     html += '''                        </div>
                     </div>

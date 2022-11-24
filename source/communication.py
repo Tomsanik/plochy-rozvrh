@@ -1,12 +1,15 @@
-import requests
-import json
+"""Communication with server"""
 from datetime import date
 import os
+import json
+import sys
+import requests
 
-url_gpi = 'https://bakalari.gpisnicka.cz/bakaweb/api/'
+URL_GPI = 'https://bakalari.gpisnicka.cz/bakaweb/api/'
 
 
-def get_tokens(username, password, url=url_gpi):
+def get_tokens(username, password, url=URL_GPI):
+    """gets tokens from server"""
     if url[-1] != '/':
         url += '/'
     print('URL accessed: ', url)
@@ -16,7 +19,8 @@ def get_tokens(username, password, url=url_gpi):
     user, psswd = username, password
     xml_string = f'client_id=ANDR&grant_type=password&username={user}&password={psswd}'
     try:
-        r = requests.post(url + 'login', data=xml_string, headers={'Content-Type': 'application/x-www-form-urlencoded'},
+        r = requests.post(url + 'login', data=xml_string,
+                          headers={'Content-Type': 'application/x-www-form-urlencoded'},
                           timeout=3)
         r.raise_for_status()
     except requests.exceptions.HTTPError as errh:
@@ -37,51 +41,56 @@ def get_tokens(username, password, url=url_gpi):
     PATH = os.getcwd() + '\\assets'
     if not os.path.exists(PATH):
         os.mkdir(PATH)
-    with open(PATH + '\\tokens.json', 'w') as file:
+    with open(PATH + '\\tokens.json', 'w', encoding='utf-8') as file:
         file.write(r.text)
     return True
 
 
-def refresh_access_token(url=url_gpi):
+def refresh_access_token(url=URL_GPI):
+    """Refreshes access token"""
     PATH = os.getcwd()
     try:
-        with open(PATH + "\\assets\\tokens.json", "r") as f:
+        with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as f:
             toks = json.load(f)
     except FileNotFoundError:
         print('No login tokens found.')
         # start the program anew and exit current one?
-        exit()
+        sys.exit()
     rtok = toks['refresh_token']
     xml_string = f'client_id=ANDR&grant_type=refresh_token&refresh_token={rtok}'
-    x = requests.post(url + 'login', data=xml_string, headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    x = requests.post(url + 'login', data=xml_string,
+                      headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                      timeout=3)
     data = json.loads(x.text)
-    with open(PATH + "\\assets\\tokens.json", 'w') as file:
+    with open(PATH + "\\assets\\tokens.json", 'w', encoding='utf-8') as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-def get_permanent_timetable(url=url_gpi):
+def get_permanent_timetable(url=URL_GPI):
+    """Gets permament timetable"""
     PATH = os.getcwd()
-    with open(PATH + "\\assets\\tokens.json", "r") as f:
+    with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as f:
         toks = json.load(f)
     rtok = toks['access_token']
     y = requests.get(url + '3/timetable/permanent',
                      headers={'Content-Type': 'application/x-www-form-urlencoded',
-                              'Authorization': f'Bearer {rtok}'})
+                              'Authorization': f'Bearer {rtok}'}, timeout=3)
     data = json.loads(y.text)
-    with open(PATH + "\\assets\\tokens.json", 'w') as file:
+    with open(PATH + "\\assets\\tokens.json", 'w', encoding='utf-8') as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-def get_actual_timetable(url=url_gpi, day=None):
+def get_actual_timetable(url=URL_GPI, day=None):
+    """Get timetable of week including given date"""
     PATH = os.getcwd()
-    with open(PATH + "\\assets\\tokens.json", "r") as f:
+    with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as f:
         toks = json.load(f)
     if day is None:
         day = date.today()
     rtok = toks['access_token']
     y = requests.get(url + f'3/timetable/actual?date={day}',
                      headers={'Content-Type': 'application/x-www-form-urlencoded',
-                              'Authorization': f'Bearer {rtok}'})
+                              'Authorization': f'Bearer {rtok}'}, timeout=3)
     data = json.loads(y.text)
-    with open(PATH + '\\assets\\rozvrh-aktualni.json', 'w') as file:
+    with open(PATH + '\\assets\\rozvrh-aktualni.json', 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=4)
