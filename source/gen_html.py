@@ -128,6 +128,8 @@ def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
                         grp = val_in_dict(grps, h['GroupIds'][0])['Abbrev']
                     case 'Canceled':
                         sub = h['Change']['TypeAbbrev']
+                        if sub is None:
+                            sub = 'Zruš'
                         rom = ''
                         grp = ''
                     case 'Substitution':
