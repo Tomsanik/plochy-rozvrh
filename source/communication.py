@@ -1,5 +1,5 @@
 """Communication with server"""
-from datetime import date
+from datetime import date, timedelta
 import os
 import json
 import sys
@@ -80,13 +80,12 @@ def get_permanent_timetable(url=URL_GPI):
         json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-def get_actual_timetable(url=URL_GPI, day=None):
+def get_actual_timetable(week=0, url=URL_GPI):
     """Get timetable of week including given date"""
     PATH = os.getcwd()
-    with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as f:
-        toks = json.load(f)
-    if day is None:
-        day = date.today()
+    with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as file:
+        toks = json.load(file)
+    day = date.today()+timedelta(days=week*7)
     rtok = toks['access_token']
     y = requests.get(url + f'3/timetable/actual?date={day}',
                      headers={'Content-Type': 'application/x-www-form-urlencoded',

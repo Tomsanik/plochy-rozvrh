@@ -9,19 +9,35 @@ from wallpaper import get_set_wallpaper
 from win10toast import ToastNotifier
 
 
-
-def _the_magic(day, hour):
+def _the_magic(hour, week_change):
     zoom = 1.28
     max_hour = 9
+    dow = datetime.now().weekday()
     refresh_access_token()
-    get_actual_timetable()  # day=datetime(2022, 11, 7))
-    width, height = generate_html(day, hour, max_hour, zoom)
+    get_actual_timetable(week_change)
+    if week_change != 0:
+        dow = 5  # saturday, so that no hour is highlighted
+    width, height = generate_html(dow, hour, max_hour, zoom)
     html_img(width, height)
     get_set_wallpaper(width, height)
-    _throw_notif(f'Následuje {hour + 1}. hodina')
+    _throw_notif(week_change, hour)
 
 
-def _throw_notif(note):
+def _throw_notif(week, hour):
+    if week != 0:
+        note = 'Zobrazuji rozvrh {} {} {}. '
+        if week >= 5:
+            note = note.format('za', week, 'týdnů')
+        elif week > 1:
+            note = note.format('za', week, 'týdny')
+        elif week == 1:
+            note = note.format('za', week, 'týden')
+        elif week == -1:
+            note = note.format('před', abs(week), 'týdnem')
+        else:
+            note = note.format('před', abs(week), 'týdny')
+    else:
+        note = f'Následuje {hour + 1}. hodina'
     toast = ToastNotifier()
     toast.show_toast(
         title="Tapeta s rozvrhem obnovena",
@@ -36,6 +52,8 @@ class Magic:
     def __init__(self):
         self._thr = None
         self.running = False
+        self.cast_now = False
+        self.week = 0  # 0=actual, >0=future, <0=past
 
     def start(self):
         """Start all the magic"""
@@ -50,6 +68,24 @@ class Magic:
         self.running = False
         self._thr.join()
         self._thr = None
+
+    def update_now(self):
+        """Updates at next opportunity"""
+        self.cast_now = True
+
+    def next_week(self):
+        """Shows next week's schedule"""
+        self.week += 1
+        return self.week
+
+    def prev_week(self):
+        """Shows previous week's schedule"""
+        self.week += -1
+        return self.week
+
+    def act_week(self):
+        """Show actual week"""
+        self.week = 0
 
     def is_running(self):
         """Are you even magical or what?"""
@@ -73,15 +109,17 @@ class Magic:
             tnow = datetime.now()
             print(f'Last update before {dt_sec(last_update, tnow)} s')
             print(f'\tlast = {last_update} \n\ttnow = {tnow}')
+            if self.cast_now:
+                last_update = datetime(2022, 1, 1, 0, 0, 0, 0)
             for i in reversed(range(len(utimes))):
                 tupdate = datetime.combine(tnow.date(), datetime.time(utimes[i]))
                 ldt = dt_sec(last_update, tupdate)
                 adt = dt_sec(tnow, tupdate)
                 if adt * ldt < 0:
                     print(f'\tupdate = {tupdate.time()} \tdt = {adt} \tldt = {ldt}')
-                    # handle exceptions!!
-                    _the_magic(datetime.now().weekday(), i)
+                    _the_magic(i, self.week)  # handle exceptions!!
                     last_update = tnow
+                    self.cast_now = False
                     break
                 if 0 < adt < sleep_time:
                     quick_sleep = adt + 1
@@ -90,6 +128,9 @@ class Magic:
                 time.sleep(quick_sleep)
                 quick_sleep = 0
             else:
-                time.sleep(sleep_time)
+                for i in range(sleep_time):
+                    time.sleep(1)
+                    if self.cast_now or not self.running:
+                        break
             if not self.running:
                 break
