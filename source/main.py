@@ -155,6 +155,9 @@ if __name__ == '__main__':
 
     widgets['bt_nweek'].bind('<Button>', next_week)
     widgets['bt_nweek'].pack(expand=True, side=tk.LEFT)
+    
+    widgets['en_uname'].bind('<Return>', login)
+    widgets['en_psswd'].bind('<Return>', login)
 
     root.protocol('WM_DELETE_WINDOW', withdraw_window)
     root.mainloop()
