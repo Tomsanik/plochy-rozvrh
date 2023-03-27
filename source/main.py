@@ -110,6 +110,8 @@ if __name__ == '__main__':
     root.iconbitmap('source\\bakalari.ico')
     root.geometry('350x230+500+200')
     root.resizable(False, False)
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
 
     f1 = ttk.Frame()
     f2 = ttk.Frame()

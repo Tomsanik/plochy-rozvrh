@@ -5,25 +5,34 @@ from PIL import Image
 
 
 def get_set_wallpaper(width, height):
-    """It just does what it is suppose to do"""
+    """It just does what it is supposed to do"""
     PATH = os.getcwd()
-    wallp = Image.open(PATH+'\\wallpaper.jpg')
+    wallp = Image.open(PATH+'\\wallpaper2.jpg')
 
     PATH += '\\assets'
     rozv = Image.open(PATH+'\\page.png')
 
+    user32 = ctypes.windll.user32
+    user32.SetProcessDPIAware()
     imgmap = wallp.load()
+    scw, swh = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
     wpw, wph = wallp.size
-    # row, roh = rozv.size
-    row, roh = width, height
+    k = wpw/scw
+    print(scw, swh)
+    print(k)
+    new_size = (int(rozv.size[0] * k), int(rozv.size[1] * k))
+    rozv = rozv.resize(new_size)
+
+    row, roh = int(width*k), int(height*k-6)
 
     # stupidly done, but hey, if it works...
-    x0_ = wpw - row - 20
-    y0_ = wph - roh - 92
+    x0w = wpw - row - int(20*k)
+    y0w = wph - roh - int(92*k)
+    x0r, y0r = int(10*k), int(10*k)
 
-    for x in range(width):
-        for y in range(height):
-            imgmap[x0_+x, y0_+y] = rozv.getpixel((x+10, y+10))
+    for x in range(row):
+        for y in range(roh):
+            imgmap[x0w+x, y0w+y] = rozv.getpixel((x0r+x, y0r+y))
 
     wallp.save(PATH+"\\final.png")
 
