@@ -7,11 +7,12 @@ from PIL import Image
 def get_set_wallpaper(width, height):
     """It just does what it is supposed to do"""
     PATH = os.getcwd()
-    wallp = Image.open(PATH+'\\wallpaper2.jpg')
+    wallp = Image.open(PATH+'\\wallpaper.jpg')
 
     PATH += '\\assets'
     rozv = Image.open(PATH+'\\page.png')
 
+    height += -3
     user32 = ctypes.windll.user32
     user32.SetProcessDPIAware()
     imgmap = wallp.load()
@@ -21,7 +22,7 @@ def get_set_wallpaper(width, height):
     new_size = (int(rozv.size[0] * k), int(rozv.size[1] * k))
     rozv = rozv.resize(new_size)
 
-    row, roh = int(width*k), int(height*k-6)
+    row, roh = int(width*k), int(height*k)
 
     # stupidly done, but hey, if it works...
     x0w = wpw - row - int(20*k)
