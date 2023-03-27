@@ -18,8 +18,6 @@ def get_set_wallpaper(width, height):
     scw, swh = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
     wpw, wph = wallp.size
     k = wpw/scw
-    print(scw, swh)
-    print(k)
     new_size = (int(rozv.size[0] * k), int(rozv.size[1] * k))
     rozv = rozv.resize(new_size)
 
