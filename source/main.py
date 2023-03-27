@@ -10,6 +10,7 @@ from magic_casting import Magic
 
 def withdraw_window(_event=None):
     """Window closes to system tray if update thread is running"""
+
     def show_window(icon1, _item1):
         icon1.stop()
         root.after(0, root.deiconify)
@@ -17,7 +18,7 @@ def withdraw_window(_event=None):
     if magic.is_running():
         root.withdraw()
         image = Image.open("source/bakalari.ico")
-        menu = (MenuItem('Show', show_window, default=True, visible=False), )
+        menu = (MenuItem('Show', show_window, default=True, visible=False),)
         icon = Icon("name", image, "Plozvrh", menu)
         icon.run()
     else:
@@ -72,7 +73,7 @@ def next_week(_event):
     elif wk == 0:
         s = 'Aktuální týden'
     else:
-        s =f'Týden {wk}'
+        s = f'Týden {wk}'
     widgets['lb_week'].config(text=s)
     # widgets['bt_update'].config(state='enabled')
 
@@ -85,13 +86,13 @@ def prev_week(_event):
     elif wk == 0:
         s = 'Aktuální týden'
     else:
-        s =f'Týden {wk}'
+        s = f'Týden {wk}'
     widgets['lb_week'].config(text=s)
     # widgets['bt_update'].config(state='enabled')
 
 
-def actual_week(_event):
-    """Update wallpaper with actual week"""
+def current_week(_event):
+    """Update wallpaper with current week"""
     magic.act_week()
     widgets['lb_week'].config(text='Aktuální týden')
     # widgets['bt_update'].config(state='enabled')
@@ -150,12 +151,12 @@ if __name__ == '__main__':
     widgets['bt_pweek'].bind('<Button>', prev_week)
     widgets['bt_pweek'].pack(expand=True, side=tk.LEFT)
 
-    widgets['bt_aweek'].bind('<Button>', actual_week)
+    widgets['bt_aweek'].bind('<Button>', current_week)
     widgets['bt_aweek'].pack(expand=True, side=tk.LEFT)
 
     widgets['bt_nweek'].bind('<Button>', next_week)
     widgets['bt_nweek'].pack(expand=True, side=tk.LEFT)
-    
+
     widgets['en_uname'].bind('<Return>', login)
     widgets['en_psswd'].bind('<Return>', login)
 

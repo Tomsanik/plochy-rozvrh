@@ -10,13 +10,16 @@ from win10toast import ToastNotifier
 
 
 def _the_magic(hour, week_change):
+    """
+    wekk_change: o kolik tydnu posunout rozvrh
+    """
     zoom = 1.28
     max_hour = 9
     dow = datetime.now().weekday()
     refresh_access_token()
     get_actual_timetable(week_change)
-    if week_change != 0:
-        dow = 5  # saturday, so that no hour is highlighted
+    if week_change != 0:  # pokud nechci současný týden, ale posunutý
+        dow = 5  # set day of week to saturday, so that no hour is highlighted
     width, height = generate_html(dow, hour, max_hour, zoom)
     html_img(width, height)
     get_set_wallpaper(width, height)

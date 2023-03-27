@@ -1,4 +1,4 @@
-"""Final stage of the process, YEAH!"""
+"""Final stage of process, YEAH!"""
 import os
 import ctypes
 from PIL import Image
@@ -14,15 +14,16 @@ def get_set_wallpaper(width, height):
 
     imgmap = wallp.load()
     wpw, wph = wallp.size
-    row, roh = rozv.size
+    # row, roh = rozv.size
+    row, roh = width, height
 
     # stupidly done, but hey, if it works...
     x0_ = wpw - row - 20
     y0_ = wph - roh - 92
 
-    for x__ in range(width):
-        for __ in range(height):
-            imgmap[x0_+x__, y0_+__] = rozv.getpixel((x__+10, __+10))
+    for x in range(width):
+        for y in range(height):
+            imgmap[x0_+x, y0_+y] = rozv.getpixel((x+10, y+10))
 
     wallp.save(PATH+"\\final.png")
 
