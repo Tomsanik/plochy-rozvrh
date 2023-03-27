@@ -119,9 +119,9 @@ if __name__ == '__main__':
                'lb_output': ttk.Label(text=''), 'bt_start': ttk.Button(f1, text='Přihlásit'),
                'bt_stop': ttk.Button(f1, text='Odhlásit'),
                'bt_quit': ttk.Button(f1, text='Ukončit'),
-               'bt_pweek': ttk.Button(f2, text='Týden -1'),
-               'bt_aweek': ttk.Button(f2, text='Teď'),
-               'bt_nweek': ttk.Button(f2, text='Týden +1'),
+               'bt_pweek': ttk.Button(f2, text='<-- týden'),
+               'bt_aweek': ttk.Button(f2, text='dnes'),
+               'bt_nweek': ttk.Button(f2, text='týden -->'),
                'lb_week': ttk.Label(f3, text='Aktuální týden'),
                'bt_update': ttk.Button(f3, text='Obnovit')}
 
