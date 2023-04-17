@@ -2,43 +2,49 @@
 import threading
 from datetime import datetime
 import time
-from communication import get_actual_timetable, refresh_access_token
+from communication import get_current_timetable, refresh_access_token
 from gen_html import generate_html
 from html_to_image import html_img
 from wallpaper import get_set_wallpaper
 from win10toast import ToastNotifier
 
 
-def _the_magic(hour, week_change):
+def _the_magic(hour, day, URL):
     """
-    wekk_change: o kolik tydnu posunout rozvrh
+    # week_change: o kolik tydnu posunout rozvrh
+    day: one day in the week to show up
     """
     zoom = 1.28
     max_hour = 9
-    dow = datetime.now().weekday()
-    refresh_access_token()
-    get_actual_timetable(week_change)
-    if week_change != 0:  # pokud nechci současný týden, ale posunutý
+    refresh_access_token(URL)
+    week0 = day.isocalendar().week
+    week1 = datetime.now().isocalendar().week
+    if week0 != week1:
         dow = 5  # set day of week to saturday, so that no hour is highlighted
+    else:
+        dow = datetime.now().weekday()
+    get_current_timetable(day, URL)
     width, height = generate_html(dow, hour, max_hour, zoom)
     html_img(width, height)
     get_set_wallpaper(width, height)
-    _throw_notif(week_change, hour)
+    _throw_notif(day, hour, week0 - week1)
 
 
-def _throw_notif(week, hour):
-    if week != 0:
-        note = 'Zobrazuji rozvrh {} {} {}. '
-        if week >= 5:
-            note = note.format('za', week, 'týdnů')
-        elif week > 1:
-            note = note.format('za', week, 'týdny')
-        elif week == 1:
-            note = note.format('za', week, 'týden')
-        elif week == -1:
-            note = note.format('před', abs(week), 'týdnem')
-        else:
-            note = note.format('před', abs(week), 'týdny')
+def _throw_notif(day, hour, dweek):
+    if dweek != 0:
+        note = 'Zobrazuji rozvrh na den {}'
+        note.format(day.strftime('%d. %m. %Y'))
+    #     note = 'Zobrazuji rozvrh {} {} {}. '
+    #     if week >= 5:
+    #         note = note.format('za', week, 'týdnů')
+    #     elif week > 1:
+    #         note = note.format('za', week, 'týdny')
+    #     elif week == 1:
+    #         note = note.format('za', week, 'týden')
+    #     elif week == -1:
+    #         note = note.format('před', abs(week), 'týdnem')
+    #     else:
+    #         note = note.format('před', abs(week), 'týdny')
     else:
         note = f'Následuje {hour + 1}. hodina'
     toast = ToastNotifier()
@@ -56,7 +62,8 @@ class Magic:
         self._thr = None
         self.running = False
         self.cast_now = False
-        self.week = 0  # 0=actual, >0=future, <0=past
+        self.week = datetime.now()
+        self.URL = None
 
     def start(self):
         """Start all the magic"""
@@ -76,19 +83,9 @@ class Magic:
         """Updates at next opportunity"""
         self.cast_now = True
 
-    def next_week(self):
-        """Shows next week's schedule"""
-        self.week += 1
-        return self.week
-
-    def prev_week(self):
-        """Shows previous week's schedule"""
-        self.week += -1
-        return self.week
-
-    def act_week(self):
-        """Show actual week"""
-        self.week = 0
+    def set_week(self, day):
+        """Sets week to show on schedule"""
+        self.week = day
 
     def is_running(self):
         """Are you even magical or what?"""
@@ -120,7 +117,7 @@ class Magic:
                 adt = dt_sec(tnow, tupdate)
                 if adt * ldt < 0:
                     print(f'\tupdate = {tupdate.time()} \tdt = {adt} \tldt = {ldt}')
-                    _the_magic(i, self.week)  # handle exceptions!!
+                    _the_magic(i, self.week, self.URL)  # handle exceptions!!
                     last_update = tnow
                     self.cast_now = False
                     break

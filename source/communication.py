@@ -19,7 +19,7 @@ def get_tokens(username, password, url=URL_GPI):
     user, psswd = username, password
     xml_string = f'client_id=ANDR&grant_type=password&username={user}&password={psswd}'
     try:
-        r = requests.post(url + 'login', data=xml_string,
+        r = requests.post(url + 'api/login', data=xml_string,
                           headers={'Content-Type': 'application/x-www-form-urlencoded'},
                           timeout=3)
         r.raise_for_status()
@@ -58,7 +58,7 @@ def refresh_access_token(url=URL_GPI):
         sys.exit()
     rtok = toks['refresh_token']
     xml_string = f'client_id=ANDR&grant_type=refresh_token&refresh_token={rtok}'
-    x = requests.post(url + 'login', data=xml_string,
+    x = requests.post(url + 'api/login', data=xml_string,
                       headers={'Content-Type': 'application/x-www-form-urlencoded'},
                       timeout=3)
     data = json.loads(x.text)
@@ -72,7 +72,7 @@ def get_permanent_timetable(url=URL_GPI):
     with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as f:
         toks = json.load(f)
     rtok = toks['access_token']
-    y = requests.get(url + '3/timetable/permanent',
+    y = requests.get(url + 'api/3/timetable/permanent',
                      headers={'Content-Type': 'application/x-www-form-urlencoded',
                               'Authorization': f'Bearer {rtok}'}, timeout=3)
     data = json.loads(y.text)
@@ -80,16 +80,37 @@ def get_permanent_timetable(url=URL_GPI):
         json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-def get_actual_timetable(week=0, url=URL_GPI):
-    """Get timetable of week including given date"""
+def get_current_timetable(day, url=URL_GPI):
+    """Get timetable of a week
+    day: date of the day"""
     PATH = os.getcwd()
     with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as file:
         toks = json.load(file)
-    day = date.today()+timedelta(days=week*7)
+    # day = date.today()+timedelta(days=week*7)
     rtok = toks['access_token']
-    y = requests.get(url + f'3/timetable/actual?date={day}',
+    print(day)
+    y = requests.get(url + f'api/3/timetable/actual?date={day}',
                      headers={'Content-Type': 'application/x-www-form-urlencoded',
                               'Authorization': f'Bearer {rtok}'}, timeout=3)
     data = json.loads(y.text)
     with open(PATH + '\\assets\\rozvrh-aktualni.json', 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=4)
+
+
+def get_municipalities():
+    y = requests.get('https://sluzby.bakalari.cz/api/v1/municipality',
+                     headers={'Accept': 'application/json'})
+    data = json.loads(y.text)
+    res = [a["name"] for a in data]
+    res = res[1:]  # delete first one, because it's empty string nonsense
+    return res
+
+
+def get_schools(munip: str):
+    y = requests.get(f'https://sluzby.bakalari.cz/api/v1/municipality/{munip}',
+                     headers={'Accept': 'application/json'})
+    data = json.loads(y.text)['schools']
+    names = [a['name'] for a in data]
+    urls = [a['schoolUrl'] for a in data]
+    return names, urls
+
