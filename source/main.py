@@ -12,7 +12,6 @@ from datetime import datetime
 
 def withdraw_window(_event=None):
     """Window closes to system tray if update thread is running"""
-
     def show_window(icon1, _item1):
         icon1.stop()
         root.after(0, root.deiconify)
@@ -31,6 +30,8 @@ def login(_event):
     """Gets tokens from server and changes UI as needed"""
     url = widgets['lb_url'].cget("text")
     magic.URL = url
+
+    magic.set_week(widgets['de_date'].get_date())
 
     name = widgets['en_uname'].get()
     psswd = widgets['en_psswd'].get()
@@ -53,7 +54,7 @@ def login(_event):
     with open(PATH+'\\assets\\last_login.txt', 'w') as ff:
         ff.write(widgets['cb_munic'].get()+'\n')
         ff.write(widgets['cb_school'].get()+'\n')
-        ff.write(url)
+        ff.write(url+'\n')
         ff.write(widgets['en_uname'].get())
 
 
@@ -77,7 +78,6 @@ def update_now(_event):
     """Click to update"""
     magic.set_week(widgets['de_date'].get_date())
     magic.update_now()
-    # widgets['bt_update'].config(state='disabled')
     widgets['lb_week'].config(text='')
 
 
@@ -85,7 +85,6 @@ def curr_week(_event):
     """Update wallpaper with current week"""
     widgets['lb_week'].config(text='Aktuální týden')
     widgets['de_date'].set_date(datetime.now())
-    # widgets['bt_update'].config(state='enabled')
 
 
 def show_schools(_event):
@@ -138,9 +137,7 @@ if __name__ == '__main__':
                'bt_quit': ttk.Button(f1, text='Ukončit'),
                'de_date': DateEntry(f2, width=12, background='darkblue', foreground='white', borderwidth=2,
                                     locale='cs_CZ', date_pattern='dd. mm. yy'),
-               # 'bt_pweek': ttk.Button(f2, text='<-- týden'),
                'bt_cweek': ttk.Button(f2, text='dnes'),
-               # 'bt_nweek': ttk.Button(f2, text='týden -->'),
                'lb_week': ttk.Label(f3, text='Aktuální týden'),
                'bt_update': ttk.Button(f3, text='Obnovit')
                }
@@ -180,16 +177,10 @@ if __name__ == '__main__':
     widgets['bt_update'].config(state='disabled')
     widgets['bt_update'].pack(expand=True, side=tk.LEFT)
 
-    # widgets['bt_pweek'].bind('<Button>', prev_week)
-    # widgets['bt_pweek'].pack(expand=True, side=tk.LEFT)
-
     widgets['de_date'].pack(expand=True, side=tk.LEFT)
 
     widgets['bt_cweek'].bind('<Button>', curr_week)
     widgets['bt_cweek'].pack(expand=True, side=tk.LEFT)
-
-    # widgets['bt_nweek'].bind('<Button>', next_week)
-    # widgets['bt_nweek'].pack(expand=True, side=tk.LEFT)
 
     widgets['en_uname'].bind('<Return>', login)
     widgets['en_psswd'].bind('<Return>', login)
@@ -198,12 +189,13 @@ if __name__ == '__main__':
 
     try:
         f = open(PATH+'\\assets\\last_login.txt')
-        loaded = f.readlines()
+        loaded = f.read().splitlines()
         if len(loaded) == 4:
             widgets['lb_url'].config(text=loaded[2])
             widgets['cb_school'].set(loaded[1])
             widgets['cb_munic'].set(loaded[0])
-            widgets['en_uname'].config(text=loaded[3])
+            widgets['en_uname'].insert(0, loaded[3])
+            widgets['en_psswd'].focus_set()
     except FileNotFoundError:
         pass
 
