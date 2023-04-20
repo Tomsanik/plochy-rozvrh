@@ -50,10 +50,11 @@ def login(_event):
     widgets['bt_update'].config(state='enabled')
     widgets['cb_munic'].config(state='disabled')
     widgets['cb_school'].config(state='disabled')
-    with open(PATH+'\\assets\\last_login_address.txt', 'w') as ff:
+    with open(PATH+'\\assets\\last_login.txt', 'w') as ff:
         ff.write(widgets['cb_munic'].get()+'\n')
         ff.write(widgets['cb_school'].get()+'\n')
         ff.write(url)
+        ff.write(widgets['en_uname'].get())
 
 
 def logout(_event):
@@ -193,13 +194,16 @@ if __name__ == '__main__':
     widgets['en_uname'].bind('<Return>', login)
     widgets['en_psswd'].bind('<Return>', login)
 
+    widgets['en_uname'].focus_set()
+
     try:
-        f = open(PATH+'\\assets\\last_login_address.txt')
+        f = open(PATH+'\\assets\\last_login.txt')
         loaded = f.readlines()
-        if len(loaded) == 3:
+        if len(loaded) == 4:
             widgets['lb_url'].config(text=loaded[2])
             widgets['cb_school'].set(loaded[1])
             widgets['cb_munic'].set(loaded[0])
+            widgets['en_uname'].config(text=loaded[3])
     except FileNotFoundError:
         pass
 
