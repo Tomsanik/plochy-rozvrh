@@ -27,7 +27,7 @@ Výhodou takto umístěného rozvrhu je to, že ho má učitel neustále po ruce
 - Program se nespouští automaticky, je třeba ho po zapnutí PC spustit a přihlásit se.
 - Po prvním přihlášení uloží školu a přihlašovací jméno, abyste ho už nemuseli zadávat. Poté je tedy potřeba zadat pouze heslo.
 - Program komunikuje pouze s vámi vybraným serverem Bakalářů. Žádná data se nikam jinam neodesílají.
-- Plně free open source, tak jak to má být:).
+- Plně free open source, tak jak to příroda zamýšlela:).
 
 ## Co neumí
 - Spoustu věcí, ale nejvíce iritující je nemožnost zobrazení dohledů, suplovacích pohotovostí a zámečků (poslední hodina ve třídě). Data bohužel nejsou získatelná přes API Bakalářů.
