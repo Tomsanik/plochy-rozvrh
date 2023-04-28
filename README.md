@@ -29,15 +29,15 @@ Výhodou takto umístěného rozvrhu je to, že ho má učitel neustále po ruce
 - Program komunikuje pouze s vámi vybraným serverem Bakalářů. Žádná data se nikam jinam neodesílají.
 - Plně free open source, tak jak to má být:).
 
-## Co neumí:
+## Co neumí
 - Spoustu věcí, ale nejvíce iritující je nemožnost zobrazení dohledů, suplovacích pohotovostí a zámečků (poslední hodina ve třídě). Data bohužel nejsou získatelná přes API Bakalářů.
 
 ## Instalace
-- Pro funkčnost je bohužel potřeba mít **nainstalovaný prohlížeč [Google Chrome](https://www.google.com/intl/cs/chrome/)**. Je to proto, že se jeho headless API používá na získání obrázku rozvrhu, který je vytvořen pomocí HTML+CSS.
+- Pro funkčnost je bohužel potřeba **nainstalovat prohlížeč [Google Chrome](https://www.google.com/intl/cs/chrome/)**. Je to proto, že se jeho headless API používá na získání obrázku rozvrhu, který je vytvořen pomocí HTML+CSS.
 - Je potřeba **[nainstalovat Python3](https://www.python.org/downloads/)**. Verze 3.10 a vyšší určitě funguje, na nižších jsem to nezkoušel, ale nemusel by to být problém.
 - **Stáhněte soubory z GitHubu** a rozbalte do složky, kde bude program přebývat. Doporučuji např. domovskou složku, ale i roh plochy postačí.
-- **Spusťte skript *get_venv.bat*.** Tento skript vytvoří lokální virtuální prostředí Python ve složce s programem a stáhne do něj potřebné závislosti (soubor requirements.txt). Nechte skript doběhnout (cca 1 minutu) a až budete vyzváni, stiskněte libovolnou klávesu. Tím vznikne adresář *venv*.
-- Vše je připravené, můžete **program spustit pomocí skriptu *RUN.bat*.**
+- **Spusťte skript _get_venv.bat_.** Tento skript vytvoří lokální virtuální prostředí Python ve složce s programem a stáhne do něj potřebné závislosti (soubor requirements.txt). Nechte skript doběhnout (cca 1 minutu) a až budete vyzváni, stiskněte libovolnou klávesu. Tím vznikne adresář *venv*.
+- Vše je připravené, můžete **program spustit pomocí skriptu _RUN.bat_.**
 
 ## Poznámky k instalaci
 - Pro budoucí pohodlí doporučuji vytvořit zástupce *RUN.bat* na ploše.
@@ -55,27 +55,28 @@ Výhodou takto umístěného rozvrhu je to, že ho má učitel neustále po ruce
 - Políčka zešednou a objeví se tlačítko Minimalizovat. Jeho stisknutím se program přesune do oznamovací lišty. Stejný efekt má i křížek v rohu okna.
 - Město, škola a uživatelské jméno se uloží do adresáře s programem. Při dalším přihlášení bude potřeba zadat pouze heslo.
 
-## Ukončení programu:
+## Ukončení programu
 - Pro ukončení programu je potřeba se odhlásit kliknutím na tlačítko Odhlásit.
 - Program ukončíte tlačítkem Ukončit nebo křížkem v rohu okna.
 
-## Tipy:
+## Tipy
 - Na plochu se ve Windows dá snadno dostat kliknutím do úplného pravého konce lišty (pravý dolní roh obrazovky).
 - Opětovným kliknutím se obnoví poloha oken.
 - Ve složce source je celý zdrojový kód. Program je obyčejný Python. Feel free to browse and modify.
 - V základní složce programu je soubor *wallpaper.png*. Ten můžete nahradit libovolnou jinou tapetou ve fomátu *PNG*, jen ji pojmenujte opět *wallpaper.png*. Program zvládne libovolné rozlišení tapety s tím, že si rozvrh naškáluje na danou velikost na obrazovce.
 
-## Testovací provoz:
+## Testovací provoz
 - Program byl testován ponejvíce autorem a úzkým okruhem kolegů.
 - Je v podstatě jisté, že rozmanitost škol, počítačů a uživatelů napříč školstvím objeví nejednu chybu.
 - Při objevení jakékoliv závady či nefunkčnosti prosím nahlásit založením **Issue na Githubu**. Časem sem přidám i mail dedikovaný pro tento účel.
 - Za screenshoty s problémy budu rád.
 
-## Návod na debugging (mírně pokročilí):
+## Návod na debugging (mírně pokročilí)
 - Když se program chová nestandardně (neaktualizuje rozvrh, nejde přihlásit, nejde spustit,...), je možné zjistit, co se děje pohledem do hlubin výpisu programu.
 - Je třeba, aby se program nespouštěl pomocí windowless Pythonu, ale normálního.
 - Ve skriptu *RUN.bat* upravte v cestě k Pythonu slovo
-…/python**w**.exe… na slovo
-…/python.exe…
+  ```…/python**w**.exe… ```
+  na slovo
+ ``` …/python.exe…```
 - Po opětovném spuštění se k programu spustí i konzole, kde jsou vidět jeho výpisy. S těmi možná budete schopni problém vyřešit, případně ho přiložte k Issue pro snazší opravu.
 - Pokud byste narazili na problém, který se vám povedlo spravit, dejte prosím vědět.
