@@ -80,3 +80,6 @@ Výhodou takto umístěného rozvrhu je to, že ho má učitel neustále po ruce
  ``` …/python.exe…```
 - Po opětovném spuštění se k programu spustí i konzole, kde jsou vidět jeho výpisy. S těmi možná budete schopni problém vyřešit, případně ho přiložte k Issue pro snazší opravu.
 - Pokud byste narazili na problém, který se vám povedlo spravit, dejte prosím vědět.
+
+## Uznání
+Vše stojí na excelentní práci s dokumentací [API Bakalářu](https://github.com/bakalari-api/bakalari-api-v3). Díky moc.
