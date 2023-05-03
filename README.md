@@ -75,7 +75,7 @@ Výhodou takto umístěného rozvrhu je to, že ho má učitel neustále po ruce
 - Když se program chová nestandardně (neaktualizuje rozvrh, nejde přihlásit, nejde spustit,...), je možné zjistit, co se děje pohledem do hlubin výpisu programu.
 - Je třeba, aby se program nespouštěl pomocí windowless Pythonu, ale normálního.
 - Ve skriptu *RUN.bat* upravte v cestě k Pythonu slovo
-  ```…/python**w**.exe… ```
+  ```…/pythonw.exe… ```
   na slovo
  ``` …/python.exe…```
 - Po opětovném spuštění se k programu spustí i konzole, kde jsou vidět jeho výpisy. S těmi možná budete schopni problém vyřešit, případně ho přiložte k Issue pro snazší opravu.
