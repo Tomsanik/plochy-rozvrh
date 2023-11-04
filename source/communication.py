@@ -5,10 +5,8 @@ import json
 import sys
 import requests
 
-URL_GPI = 'https://bakalari.gpisnicka.cz/bakaweb/api/'
 
-
-def get_tokens(username, password, url=URL_GPI):
+def get_tokens(username, password, url):
     """gets tokens from server"""
     if url[-1] != '/':
         url += '/'
@@ -46,7 +44,7 @@ def get_tokens(username, password, url=URL_GPI):
     return True
 
 
-def refresh_access_token(url=URL_GPI):
+def refresh_access_token(url):
     """Refreshes access token"""
     PATH = os.getcwd()
     try:
@@ -66,7 +64,7 @@ def refresh_access_token(url=URL_GPI):
         json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-def get_permanent_timetable(url=URL_GPI):
+def get_permanent_timetable(url):
     """Gets permament timetable"""
     PATH = os.getcwd()
     with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as f:
@@ -80,8 +78,8 @@ def get_permanent_timetable(url=URL_GPI):
         json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-def get_current_timetable(day, url=URL_GPI):
-    """Get timetable of a week
+def get_current_timetable(day, url):
+    """Get timetable for a week
     day: date of the day"""
     PATH = os.getcwd()
     with open(PATH + "\\assets\\tokens.json", "r", encoding='utf-8') as file:

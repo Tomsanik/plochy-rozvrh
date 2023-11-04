@@ -1,11 +1,12 @@
 """Current school schedule on the wallpaper easily"""
+import ctypes
 import os
 import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
 from pystray import MenuItem, Icon
 from PIL import Image
-from communication import get_tokens, get_municipalities, get_schools
+from communication import get_tokens, get_municipalities, get_schools, get_current_timetable
 from magic_casting import Magic
 from datetime import datetime
 
@@ -30,8 +31,8 @@ def login(_event):
     """Gets tokens from server and changes UI as needed"""
     url = widgets['lb_url'].cget("text")
     magic.URL = url
-
     magic.set_week(widgets['de_date'].get_date())
+    magic.size = widgets['cb_size'].get()
 
     name = widgets['en_uname'].get()
     psswd = widgets['en_psswd'].get()
@@ -51,11 +52,9 @@ def login(_event):
     widgets['bt_update'].config(state='enabled')
     widgets['cb_munic'].config(state='disabled')
     widgets['cb_school'].config(state='disabled')
+    lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), url, widgets['en_uname'].get(), widgets['cb_size'].get()]
     with open(PATH+'\\assets\\last_login.txt', 'w') as ff:
-        ff.write(widgets['cb_munic'].get()+'\n')
-        ff.write(widgets['cb_school'].get()+'\n')
-        ff.write(url+'\n')
-        ff.write(widgets['en_uname'].get())
+        ff.write('\n'.join(map(str, lines)))
 
 
 def logout(_event):
@@ -115,16 +114,15 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title('Plozvrh')
     root.iconbitmap('source\\bakalari.ico')
-    root.geometry('350x300+500+200')
+    root.geometry('350x320+500+200')
     root.resizable(False, False)
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
 
     f01 = ttk.Frame()
     f02 = ttk.Frame()
     f1 = ttk.Frame()
     f2 = ttk.Frame()
     f3 = ttk.Frame()
+    f4 = ttk.Frame()
     widgets = {'lb_munic': ttk.Label(f01, text='Vyber město'),
                'cb_munic': ttk.Combobox(f01, state="readonly", width=40),
                'lb_school': ttk.Label(f02, text='Vyber školu'),
@@ -139,7 +137,9 @@ if __name__ == '__main__':
                                     locale='cs_CZ', date_pattern='dd. mm. yy'),
                'bt_cweek': ttk.Button(f2, text='dnes'),
                'lb_week': ttk.Label(f3, text='Aktuální týden'),
-               'bt_update': ttk.Button(f3, text='Obnovit')
+               'bt_update': ttk.Button(f3, text='Obnovit'),
+               'lb_size': ttk.Label(f4, text='Velikost rozvrhu'),
+               'cb_size': ttk.Combobox(f4, state="readonly", width=6)
                }
 
     f01.pack()
@@ -160,6 +160,7 @@ if __name__ == '__main__':
     f1.pack()
     f2.pack()
     f3.pack()
+    f4.pack()
 
     widgets['bt_start'].bind('<Button>', login)
     widgets['bt_start'].pack(expand=True, side=tk.LEFT)
@@ -184,17 +185,22 @@ if __name__ == '__main__':
 
     widgets['en_uname'].bind('<Return>', login)
     widgets['en_psswd'].bind('<Return>', login)
-
     widgets['en_uname'].focus_set()
+
+    widgets['lb_size'].pack(expand=True, side=tk.LEFT)
+    widgets['cb_size'].config(values=['25%', '40%', '60%'])
+    widgets['cb_size'].set('40%')
+    widgets['cb_size'].pack(expand=True, side=tk.LEFT)
 
     try:
         f = open(PATH+'\\assets\\last_login.txt')
         loaded = f.read().splitlines()
-        if len(loaded) == 4:
+        if len(loaded) == 5:
             widgets['lb_url'].config(text=loaded[2])
             widgets['cb_school'].set(loaded[1])
             widgets['cb_munic'].set(loaded[0])
             widgets['en_uname'].insert(0, loaded[3])
+            widgets['cb_size'].set(loaded[4])
             widgets['en_psswd'].focus_set()
     except FileNotFoundError:
         pass

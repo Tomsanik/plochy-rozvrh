@@ -1,12 +1,14 @@
 """Expeliarmus etc."""
+import os
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from communication import get_current_timetable, refresh_access_token
 from gen_html import generate_html
 from html_to_image import html_img
 from wallpaper import get_set_wallpaper
 from win10toast import ToastNotifier
+import json
 
 
 def _the_magic(hour, day, URL):
@@ -20,7 +22,7 @@ def _the_magic(hour, day, URL):
     week0 = day.isocalendar().week
     week1 = datetime.now().isocalendar().week
     if week0 != week1:
-        dow = 5  # set day of week to saturday, so that no hour is highlighted
+        dow = 5  # set the day of the week to saturday, so that no hour is highlighted
     else:
         dow = datetime.now().weekday()
     get_current_timetable(day, URL)
@@ -34,17 +36,6 @@ def _throw_notif(day, hour, dweek):
     if dweek != 0:
         note = 'Zobrazuji rozvrh na den {}'
         note.format(day.strftime('%d. %m. %Y'))
-    #     note = 'Zobrazuji rozvrh {} {} {}. '
-    #     if week >= 5:
-    #         note = note.format('za', week, 'týdnů')
-    #     elif week > 1:
-    #         note = note.format('za', week, 'týdny')
-    #     elif week == 1:
-    #         note = note.format('za', week, 'týden')
-    #     elif week == -1:
-    #         note = note.format('před', abs(week), 'týdnem')
-    #     else:
-    #         note = note.format('před', abs(week), 'týdny')
     else:
         note = f'Následuje {hour + 1}. hodina'
     toast = ToastNotifier()
@@ -64,6 +55,7 @@ class Magic:
         self.cast_now = False
         self.week = datetime.now()
         self.URL = None
+        self.size = ''
 
     def start(self):
         """Start all the magic"""
@@ -96,10 +88,20 @@ class Magic:
             return round((tf_ - ti_).total_seconds())
 
         print('Úspěšně přihlášení')
-        # start v 7:30
-        utimes = ['07:30:00', '08:45:00', '09:40:00', '10:45:00',
-                  '11:40:00', '12:35:00', '13:30:00', '14:25:00', '15:15:00']
-        utimes = [datetime.strptime(tt, "%H:%M:%S") for tt in utimes]
+
+        # Getting update times from downloaded timetable
+        PATH = os.getcwd() + '\\assets'
+        with open(PATH + '\\rozvrh-aktualni.json', encoding='utf-8') as js:
+            rozvrh = json.load(js)
+        hors = rozvrh['Hours']
+        utimes = []
+        uhours = []
+        for i, h in enumerate(hors):
+            if i == 0:
+                utimes.append(datetime.strptime(h["BeginTime"], "%H:%M"))
+                uhours.append(0)
+            utimes.append(datetime.strptime(h["EndTime"], "%H:%M"))
+            uhours.append(i)
 
         last_update = datetime(2022, 1, 1, 0, 0, 0, 0)
         quick_sleep = 0
@@ -111,13 +113,13 @@ class Magic:
             print(f'\tlast = {last_update} \n\ttnow = {tnow}')
             if self.cast_now:
                 last_update = datetime(2022, 1, 1, 0, 0, 0, 0)
-            for i in reversed(range(len(utimes))):
-                tupdate = datetime.combine(tnow.date(), datetime.time(utimes[i]))
+            for uhour, utime in zip(reversed(uhours), reversed(utimes)):
+                tupdate = datetime.combine(tnow.date(), datetime.time(utime))
                 ldt = dt_sec(last_update, tupdate)
                 adt = dt_sec(tnow, tupdate)
                 if adt * ldt < 0:
                     print(f'\tupdate = {tupdate.time()} \tdt = {adt} \tldt = {ldt}')
-                    _the_magic(i, self.week, self.URL)  # handle exceptions!!
+                    _the_magic(uhour, self.week, self.URL)  # handle exceptions!!
                     last_update = tnow
                     self.cast_now = False
                     break
