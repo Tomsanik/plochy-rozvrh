@@ -75,6 +75,7 @@ def logout(_event):
 
 def update_now(_event):
     """Click to update"""
+    magic.size = widgets['cb_size'].get()
     magic.set_week(widgets['de_date'].get_date())
     magic.update_now()
     widgets['lb_week'].config(text='')

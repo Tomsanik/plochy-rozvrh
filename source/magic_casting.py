@@ -11,27 +11,6 @@ from win10toast import ToastNotifier
 import json
 
 
-def _the_magic(hour, day, URL):
-    """
-    # week_change: o kolik tydnu posunout rozvrh
-    day: one day in the week to show up
-    """
-    zoom = 1.28
-    max_hour = 9
-    refresh_access_token(URL)
-    week0 = day.isocalendar().week
-    week1 = datetime.now().isocalendar().week
-    if week0 != week1:
-        dow = 5  # set the day of the week to saturday, so that no hour is highlighted
-    else:
-        dow = datetime.now().weekday()
-    get_current_timetable(day, URL)
-    width, height = generate_html(dow, hour, max_hour, zoom)
-    html_img(width, height)
-    get_set_wallpaper(width, height)
-    _throw_notif(day, hour, week0 - week1)
-
-
 def _throw_notif(day, hour, dweek):
     if dweek != 0:
         note = 'Zobrazuji rozvrh na den {}'
@@ -49,6 +28,7 @@ def _throw_notif(day, hour, dweek):
 
 class Magic:
     """Class full of magic and beautiful spells"""
+
     def __init__(self):
         self._thr = None
         self.running = False
@@ -119,7 +99,7 @@ class Magic:
                 adt = dt_sec(tnow, tupdate)
                 if adt * ldt < 0:
                     print(f'\tupdate = {tupdate.time()} \tdt = {adt} \tldt = {ldt}')
-                    _the_magic(uhour, self.week, self.URL)  # handle exceptions!!
+                    self._the_magic(uhour, self.week, self.URL)  # handle exceptions!!
                     last_update = tnow
                     self.cast_now = False
                     break
@@ -136,3 +116,23 @@ class Magic:
                         break
             if not self.running:
                 break
+
+    def _the_magic(self, hour, day, URL):
+        """
+        day: week around this day will show up
+        """
+        # zoom = 1.28
+        zoom = 1.6
+        max_hour = 9
+        refresh_access_token(URL)
+        week0 = day.isocalendar().week
+        week1 = datetime.now().isocalendar().week
+        if week0 != week1:
+            dow = 5  # set the day of the week to saturday, so that no hour is highlighted
+        else:
+            dow = datetime.now().weekday()
+        get_current_timetable(day, URL)
+        width, height = generate_html(dow, hour, max_hour, zoom)
+        html_img(width, height)
+        # get_set_wallpaper(width, height)
+        _throw_notif(day, hour, week0 - week1)
