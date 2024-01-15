@@ -86,10 +86,11 @@ def get_current_timetable(day, url):
         toks = json.load(file)
     # day = date.today()+timedelta(days=week*7)
     rtok = toks['access_token']
-    print(day)
+    print(url)
     y = requests.get(url + f'api/3/timetable/actual?date={day}',
                      headers={'Content-Type': 'application/x-www-form-urlencoded',
                               'Authorization': f'Bearer {rtok}'}, timeout=3)
+    print(y.text)
     data = json.loads(y.text)
     with open(PATH + '\\assets\\rozvrh-aktualni.json', 'w', encoding='utf-8') as file:
         json.dump(data, file, indent=4)

@@ -2,36 +2,44 @@
 import os
 import ctypes
 from PIL import Image
+from html2image import Html2Image
+import time
 
 
-def get_set_wallpaper(width, height):
+def get_set_wallpaper(width, height, size):
     """It just does what it is supposed to do"""
     PATH = os.getcwd()
-    wallp = Image.open(PATH+'\\wallpaper.jpg')
+    wallp = Image.open(os.path.join(PATH, 'wallpaper.jpg'))
+    wpw, wph = wallp.size
+
+    # create image from html
+    zoom = round(wpw*size/width, 2)
+    width = round(zoom*width)
+    height = round(zoom * (height-5))
+    with open(os.path.join(PATH, 'assets', 'rozvrh.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.format(now=time.strftime("%H:%M:%S", time.localtime()), zoom=zoom)
+
+    hti = Html2Image(output_path=os.path.join(PATH, 'assets'))
+
+    x0r, y0r = round(8 * zoom), round(8 * zoom)
+    screenshot_size = (width + x0r, height + y0r)
+
+    hti.screenshot(html_str=html,
+                   css_file=os.path.join(PATH, 'source', 'rozvrh.css'),
+                   save_as='page.png',
+                   size=screenshot_size)
+    # print(f"Screenshot saved to {os.path.join(output_dir, 'page.png')}")
 
     PATH += '\\assets'
     rozv = Image.open(PATH+'\\page.png')
-
-    height += -3
-    user32 = ctypes.windll.user32
-    user32.SetProcessDPIAware()
     imgmap = wallp.load()
-    scw, swh = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-    wpw, wph = wallp.size
-    k = wpw/scw
-    new_size = (int(rozv.size[0] * k), int(rozv.size[1] * k))
-    rozv = rozv.resize(new_size)
 
-    row, roh = int(width*k), int(height*k)
-
-    # stupidly done, but hey, if it works...
-    x0w = wpw - row - int(20*k)
-    y0w = wph - roh - int(92*k)
-    x0r, y0r = int(10*k), int(10*k)
-
-    for x in range(row):
-        for y in range(roh):
-            imgmap[x0w+x, y0w+y] = rozv.getpixel((x0r+x, y0r+y))
+    x0w = wpw*0.99 - width
+    y0w = wph*0.95 - height
+    for x in range(width):
+        for y in range(height):
+            imgmap[x0w+x, y0w+y] = rozv.getpixel((x+x0r, y+y0r))
 
     wallp.save(PATH+"\\final.png")
 

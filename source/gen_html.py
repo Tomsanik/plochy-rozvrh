@@ -1,11 +1,10 @@
 """Generates HTML file"""
 import json
 from datetime import datetime
-import time
 import os
 
 
-def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
+def generate_html(day, hour, max_item: int = 9):
     """All the magic in one def"""
     def new_item(subj, group, room, typ=''):
         add = '''               <div class="item-{ch}">
@@ -65,7 +64,7 @@ def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
                 width: 500px;
                 ">
                 <div class="main-grid" id="main-grid">\n'''
-    html = html.format(zoom=zoom)
+    # html = html.format(zoom=zoom)
 
     html += new_hour('', '')
 
@@ -151,10 +150,9 @@ def generate_html(day, hour, max_item: int = 9, zoom: float = 1):
             <div class="update-bar">aktualizováno: {now}</div>
         </body>
     </html>'''
-    html = html.format(now=time.strftime("%H:%M:%S", time.localtime()))
 
     with open(PATH + '\\rozvrh.html', 'w', encoding='utf-8') as f:
         f.write(html)
         f.close()
 
-    return round(zoom * 10 * 50), round(zoom * (days_count * 61.1 + 47.6 + 6))
+    return round(10 * 50), round(days_count * 61.1 + 47.6 + 6)

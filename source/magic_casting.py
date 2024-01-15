@@ -5,13 +5,12 @@ from datetime import datetime, timedelta
 import time
 from communication import get_current_timetable, refresh_access_token
 from gen_html import generate_html
-from html_to_image import html_img
 from wallpaper import get_set_wallpaper
 from win10toast import ToastNotifier
 import json
 
 
-def _throw_notif(day, hour, dweek):
+def _throw_notif(day, hour, dweek):     # predelat na win11toast!!
     if dweek != 0:
         note = 'Zobrazuji rozvrh na den {}'
         note.format(day.strftime('%d. %m. %Y'))
@@ -69,6 +68,8 @@ class Magic:
 
         print('Úspěšně přihlášení')
 
+        get_current_timetable(self.week, self.URL)
+
         # Getting update times from downloaded timetable
         PATH = os.getcwd() + '\\assets'
         with open(PATH + '\\rozvrh-aktualni.json', encoding='utf-8') as js:
@@ -121,8 +122,15 @@ class Magic:
         """
         day: week around this day will show up
         """
-        # zoom = 1.28
-        zoom = 1.6
+        size = 1
+        match self.size:
+            case '25%':
+                size = 0.25
+            case '60%':
+                size = 0.6
+            case _:
+                size = 0.4
+
         max_hour = 9
         refresh_access_token(URL)
         week0 = day.isocalendar().week
@@ -132,7 +140,10 @@ class Magic:
         else:
             dow = datetime.now().weekday()
         get_current_timetable(day, URL)
-        width, height = generate_html(dow, hour, max_hour, zoom)
-        html_img(width, height)
-        # get_set_wallpaper(width, height)
+
+        width, height = generate_html(dow, hour, max_hour)
+
+        # html_img(width, height)
+
+        get_set_wallpaper(width, height, size)
         _throw_notif(day, hour, week0 - week1)

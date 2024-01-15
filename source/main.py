@@ -9,6 +9,12 @@ from PIL import Image
 from communication import get_tokens, get_municipalities, get_schools, get_current_timetable
 from magic_casting import Magic
 from datetime import datetime
+import psswd
+
+
+def set_text(entry, text):
+    entry.delte(0, tk.END)
+    entry.insert(0, text)
 
 
 def withdraw_window(_event=None):
@@ -29,20 +35,23 @@ def withdraw_window(_event=None):
 
 def login(_event):
     """Gets tokens from server and changes UI as needed"""
-    url = widgets['lb_url'].cget("text")
+    url = widgets['en_url'].get()
+    if url[-1] != '/':
+        url += '/'
     magic.URL = url
     magic.set_week(widgets['de_date'].get_date())
     magic.size = widgets['cb_size'].get()
 
     name = widgets['en_uname'].get()
-    psswd = widgets['en_psswd'].get()
-    if len(name) * len(psswd) == 0:
+    pswd = widgets['en_psswd'].get()
+    if len(name) * len(pswd) == 0:
         return
-    if not get_tokens(name, psswd, url):
+    if not get_tokens(name, pswd, url):
         widgets['lb_output'].config(text='Přihlášení se nezdařilo')
         return
 
     magic.start()
+
     widgets['lb_output'].config(text='Přihlášeno!')
     widgets['en_uname'].config(state="disabled")
     widgets['en_psswd'].config(state="disabled")
@@ -52,9 +61,11 @@ def login(_event):
     widgets['bt_update'].config(state='enabled')
     widgets['cb_munic'].config(state='disabled')
     widgets['cb_school'].config(state='disabled')
+    widgets['en_url'].config(state='disabled')
     lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), url, widgets['en_uname'].get(), widgets['cb_size'].get()]
     with open(PATH+'\\assets\\last_login.txt', 'w') as ff:
         ff.write('\n'.join(map(str, lines)))
+    psswd.encrypt_psswd(name, pswd, psswd_filename)
 
 
 def logout(_event):
@@ -71,6 +82,7 @@ def logout(_event):
     widgets['bt_update'].config(state='disabled')
     widgets['cb_munic'].config(state='enabled')
     widgets['cb_school'].config(state='enabled')
+    widgets['en_url'].config(state='enabled')
 
 
 def update_now(_event):
@@ -94,13 +106,13 @@ def show_schools(_event):
     widgets['cb_school'].current(0)
     global urls
     urls = uu
-    widgets['lb_url'].config(text=urls[0])
+    widgets['en_url'].config(text=urls[0])
 
 
 def show_url(_event):
     school_index = widgets['cb_school'].current()
     url = urls[school_index]
-    widgets['lb_url'].config(text=url)
+    widgets['en_url'].config(text=url)
 
 
 if __name__ == '__main__':
@@ -108,6 +120,7 @@ if __name__ == '__main__':
     if not os.path.exists(PATH + '\\source'):
         os.chdir('../')
         PATH = os.getcwd()
+    psswd_filename = 'assets\\pssdw.xml'
 
     magic = Magic()
     urls = []
@@ -120,6 +133,7 @@ if __name__ == '__main__':
 
     f01 = ttk.Frame()
     f02 = ttk.Frame()
+    f03 = ttk.Frame()
     f1 = ttk.Frame()
     f2 = ttk.Frame()
     f3 = ttk.Frame()
@@ -128,7 +142,8 @@ if __name__ == '__main__':
                'cb_munic': ttk.Combobox(f01, state="readonly", width=40),
                'lb_school': ttk.Label(f02, text='Vyber školu'),
                'cb_school': ttk.Combobox(f02, state="readonly", width=40),
-               'lb_url': ttk.Label(text=''),
+               'lb_url2': ttk.Label(f03, text='URL'), 'en_url': ttk.Entry(f03, width=40),
+               # 'lb_url': ttk.Label(text=''),
                'lb_uname': ttk.Label(text='Uživatelské jméno'), 'en_uname': ttk.Entry(),
                'lb_psswd': ttk.Label(text='Heslo'), 'en_psswd': ttk.Entry(show='*'),
                'lb_output': ttk.Label(text=''), 'bt_start': ttk.Button(f1, text='Přihlásit'),
@@ -153,7 +168,10 @@ if __name__ == '__main__':
     widgets['lb_school'].pack(expand=True, side=tk.LEFT)
     widgets['cb_school'].bind('<<ComboboxSelected>>', show_url)
     widgets['cb_school'].pack(expand=True, side=tk.LEFT)
-    widgets['lb_url'].pack()
+    widgets['en_url'].pack()
+    f03.pack()
+    widgets['lb_url2'].pack(expand=True, side=tk.LEFT)
+    widgets['en_url'].pack(expand=True, side=tk.RIGHT)
 
     for wd in ['lb_uname', 'en_uname', 'lb_psswd', 'en_psswd', 'lb_output']:
         widgets[wd].pack(anchor=tk.W, padx=10, pady=5, fill=tk.X)
@@ -193,18 +211,23 @@ if __name__ == '__main__':
     widgets['cb_size'].set('40%')
     widgets['cb_size'].pack(expand=True, side=tk.LEFT)
 
-    try:
+    if os.path.isfile(psswd_filename):
         f = open(PATH+'\\assets\\last_login.txt')
         loaded = f.read().splitlines()
         if len(loaded) == 5:
-            widgets['lb_url'].config(text=loaded[2])
+            widgets['en_url'].insert(0, loaded[2])
             widgets['cb_school'].set(loaded[1])
             widgets['cb_munic'].set(loaded[0])
-            widgets['en_uname'].insert(0, loaded[3])
+            # widgets['en_uname'].insert(0, loaded[3])
             widgets['cb_size'].set(loaded[4])
-            widgets['en_psswd'].focus_set()
-    except FileNotFoundError:
-        pass
+            widgets['en_uname'].focus_set()
 
     root.protocol('WM_DELETE_WINDOW', withdraw_window)
+
+    if os.path.isfile(psswd_filename):
+        u, p = psswd.decrypt_psswd(psswd_filename)
+        widgets['en_uname'].insert(0, u)
+        widgets['en_psswd'].insert(0, p)
+        login(None)
+
     root.mainloop()
