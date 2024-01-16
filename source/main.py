@@ -2,18 +2,17 @@
 import os
 import tkinter as tk
 from tkinter import ttk
-
 from tkcalendar import DateEntry
 from pystray import MenuItem, Icon
 from PIL import Image
-from communication import get_tokens, get_municipalities, get_schools, get_current_timetable
+from communication import get_tokens, get_municipalities, get_schools
 from magic_casting import Magic
 from datetime import datetime
 import psswd
 
 
 def set_text(entry, text):
-    entry.delte(0, tk.END)
+    entry.delete(0, tk.END)
     entry.insert(0, text)
 
 
@@ -106,13 +105,13 @@ def show_schools(_event):
     widgets['cb_school'].current(0)
     global urls
     urls = uu
-    widgets['en_url'].config(text=urls[0])
+    set_text(widgets['en_url'], urls[0])
 
 
 def show_url(_event):
     school_index = widgets['cb_school'].current()
     url = urls[school_index]
-    widgets['en_url'].config(text=url)
+    set_text(widgets['en_url'], url)
 
 
 if __name__ == '__main__':
@@ -155,8 +154,7 @@ if __name__ == '__main__':
                'lb_week': ttk.Label(f3, text='Aktuální týden'),
                'bt_update': ttk.Button(f3, text='Obnovit'),
                'lb_size': ttk.Label(f4, text='Velikost rozvrhu'),
-               'sc_size': ttk.Scale(f4, from_=0.2, to=0.9, orient=tk.HORIZONTAL)
-               # 'cb_size': ttk.Combobox(f4, state="readonly", width=6)
+               'sc_size': ttk.Scale(f4, from_=0.2, to=0.5, orient=tk.HORIZONTAL)
                }
 
     f01.pack()
