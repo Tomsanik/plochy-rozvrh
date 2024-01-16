@@ -1,8 +1,8 @@
 """Current school schedule on the wallpaper easily"""
-import ctypes
 import os
 import tkinter as tk
 from tkinter import ttk
+
 from tkcalendar import DateEntry
 from pystray import MenuItem, Icon
 from PIL import Image
@@ -40,7 +40,7 @@ def login(_event):
         url += '/'
     magic.URL = url
     magic.set_week(widgets['de_date'].get_date())
-    magic.size = widgets['cb_size'].get()
+    magic.size = widgets['sc_size'].get()
 
     name = widgets['en_uname'].get()
     pswd = widgets['en_psswd'].get()
@@ -62,7 +62,7 @@ def login(_event):
     widgets['cb_munic'].config(state='disabled')
     widgets['cb_school'].config(state='disabled')
     widgets['en_url'].config(state='disabled')
-    lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), url, widgets['en_uname'].get(), widgets['cb_size'].get()]
+    lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), url, widgets['en_uname'].get(), widgets['sc_size'].get()]
     with open(PATH+'\\assets\\last_login.txt', 'w') as ff:
         ff.write('\n'.join(map(str, lines)))
     psswd.encrypt_psswd(name, pswd, psswd_filename)
@@ -87,7 +87,7 @@ def logout(_event):
 
 def update_now(_event):
     """Click to update"""
-    magic.size = widgets['cb_size'].get()
+    magic.size = widgets['sc_size'].get()
     magic.set_week(widgets['de_date'].get_date())
     magic.update_now()
     widgets['lb_week'].config(text='')
@@ -155,7 +155,8 @@ if __name__ == '__main__':
                'lb_week': ttk.Label(f3, text='Aktuální týden'),
                'bt_update': ttk.Button(f3, text='Obnovit'),
                'lb_size': ttk.Label(f4, text='Velikost rozvrhu'),
-               'cb_size': ttk.Combobox(f4, state="readonly", width=6)
+               'sc_size': ttk.Scale(f4, from_=0.2, to=0.9, orient=tk.HORIZONTAL)
+               # 'cb_size': ttk.Combobox(f4, state="readonly", width=6)
                }
 
     f01.pack()
@@ -207,9 +208,11 @@ if __name__ == '__main__':
     widgets['en_uname'].focus_set()
 
     widgets['lb_size'].pack(expand=True, side=tk.LEFT)
-    widgets['cb_size'].config(values=['25%', '40%', '60%'])
-    widgets['cb_size'].set('40%')
-    widgets['cb_size'].pack(expand=True, side=tk.LEFT)
+    widgets['sc_size'].set(0.3)
+    widgets['sc_size'].pack(expand=True, side=tk.LEFT)
+    # widgets['cb_size'].config(values=['25%', '40%', '60%'])
+    # widgets['cb_size'].set('40%')
+    # widgets['cb_size'].pack(expand=True, side=tk.LEFT)
 
     if os.path.isfile(psswd_filename):
         f = open(PATH+'\\assets\\last_login.txt')
@@ -219,7 +222,7 @@ if __name__ == '__main__':
             widgets['cb_school'].set(loaded[1])
             widgets['cb_munic'].set(loaded[0])
             # widgets['en_uname'].insert(0, loaded[3])
-            widgets['cb_size'].set(loaded[4])
+            widgets['sc_size'].set(float(loaded[4]))
             widgets['en_uname'].focus_set()
 
     root.protocol('WM_DELETE_WINDOW', withdraw_window)

@@ -34,7 +34,7 @@ class Magic:
         self.cast_now = False
         self.week = datetime.now()
         self.URL = None
-        self.size = ''
+        self.size = 0.3
 
     def start(self):
         """Start all the magic"""
@@ -122,15 +122,6 @@ class Magic:
         """
         day: week around this day will show up
         """
-        size = 1
-        match self.size:
-            case '25%':
-                size = 0.25
-            case '60%':
-                size = 0.6
-            case _:
-                size = 0.4
-
         max_hour = 9
         refresh_access_token(URL)
         week0 = day.isocalendar().week
@@ -145,5 +136,5 @@ class Magic:
 
         # html_img(width, height)
 
-        get_set_wallpaper(width, height, size)
+        get_set_wallpaper(width, height, self.size)
         _throw_notif(day, hour, week0 - week1)
