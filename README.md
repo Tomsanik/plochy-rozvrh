@@ -49,11 +49,12 @@ Výhodou takto umístěného rozvrhu je to, že ho má učitel neustále po ruce
 - Proveďte instalaci znovu počínaje třetím krokem (stažení z GitHubu).
 
 ## První spuštění
-- Vyberte město a školu (nebojte, stačí pouze jednou).
+- Vyberte město a školu (nebojte, stačí pouze jednou) nebo **vložte odkaz na Bakaláře do kolonky URL**.
 - Zadejte přihlašovací jméno a heslo do Bakalářů (stejné jako do webového rozhraní).
 - Klikněte na Přihlásit se.
 - Políčka zešednou a objeví se tlačítko Minimalizovat. Jeho stisknutím se program přesune do oznamovací lišty. Stejný efekt má i křížek v rohu okna.
-- Město, škola a uživatelské jméno se uloží do adresáře s programem. Při dalším přihlášení bude potřeba zadat pouze heslo.
+- Vyplněné údaje se uloží a načtou při příštím spuštění. Není je tedy potřeba znovu zadávat.
+- **Heslo je uložené v zašifrované podobě** pomocí Windows API. Není tedy nikde uloženo v plaintextu. 
 
 ## Ukončení programu
 - Pro ukončení programu je potřeba se odhlásit kliknutím na tlačítko Odhlásit.
