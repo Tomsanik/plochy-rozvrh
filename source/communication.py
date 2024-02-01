@@ -1,5 +1,4 @@
 """Communication with server"""
-from datetime import date, timedelta
 import os
 import json
 import sys

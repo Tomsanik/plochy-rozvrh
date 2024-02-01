@@ -1,6 +1,5 @@
 import win32crypt
 import binascii
-import sys
 
 
 def encrypt_psswd(username, password, filename):

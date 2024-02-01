@@ -1,7 +1,7 @@
 """Expeliarmus etc."""
 import os
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime
 import time
 from communication import get_current_timetable, refresh_access_token
 from gen_html import generate_html

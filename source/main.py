@@ -1,5 +1,6 @@
 """Current school schedule on the wallpaper easily"""
 import os
+import ctypes
 import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
@@ -18,6 +19,7 @@ def set_text(entry, text):
 
 def withdraw_window(_event=None):
     """Window closes to system tray if update thread is running"""
+
     def show_window(icon1, _item1):
         icon1.stop()
         root.after(0, root.deiconify)
@@ -61,8 +63,9 @@ def login(_event):
     widgets['cb_munic'].config(state='disabled')
     widgets['cb_school'].config(state='disabled')
     widgets['en_url'].config(state='disabled')
-    lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), url, widgets['en_uname'].get(), widgets['sc_size'].get()]
-    with open(PATH+'\\assets\\last_login.txt', 'w') as ff:
+    lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), url, widgets['en_uname'].get(),
+             widgets['sc_size'].get()]
+    with open(PATH + '\\assets\\last_login.txt', 'w') as ff:
         ff.write('\n'.join(map(str, lines)))
     psswd.encrypt_psswd(name, pswd, psswd_filename)
 
@@ -124,11 +127,14 @@ if __name__ == '__main__':
     magic = Magic()
     urls = []
 
+    user32 = ctypes.windll.user32
+    user32.SetProcessDPIAware()
+
     root = tk.Tk()
     root.title('Plozvrh')
     root.iconbitmap('source\\bakalari.ico')
-    root.geometry('350x320+500+200')
-    root.resizable(False, False)
+    root.geometry('560x512+500+200')
+    # root.resizable(False, False)
 
     f01 = ttk.Frame()
     f02 = ttk.Frame()
@@ -154,7 +160,8 @@ if __name__ == '__main__':
                'lb_week': ttk.Label(f3, text='Aktuální týden'),
                'bt_update': ttk.Button(f3, text='Obnovit'),
                'lb_size': ttk.Label(f4, text='Velikost rozvrhu'),
-               'sc_size': ttk.Scale(f4, from_=0.2, to=0.5, orient=tk.HORIZONTAL)
+               'sc_size': ttk.Scale(f4, from_=0.2, to=0.9, orient=tk.HORIZONTAL)
+               # 'cb_size': ttk.Combobox(f4, state="readonly", width=6)
                }
 
     f01.pack()
@@ -213,7 +220,7 @@ if __name__ == '__main__':
     # widgets['cb_size'].pack(expand=True, side=tk.LEFT)
 
     if os.path.isfile(psswd_filename):
-        f = open(PATH+'\\assets\\last_login.txt')
+        f = open(PATH + '\\assets\\last_login.txt')
         loaded = f.read().splitlines()
         if len(loaded) == 5:
             widgets['en_url'].insert(0, loaded[2])
