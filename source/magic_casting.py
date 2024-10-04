@@ -1,7 +1,7 @@
 """Expeliarmus etc."""
 import os
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from communication import get_current_timetable, refresh_access_token
 from gen_html import generate_html
@@ -67,7 +67,6 @@ class Magic:
             return round((tf_ - ti_).total_seconds())
 
         print('Úspěšně přihlášení')
-
         get_current_timetable(self.week, self.URL)
 
         # Getting update times from downloaded timetable
@@ -75,16 +74,19 @@ class Magic:
         with open(PATH + '\\rozvrh-aktualni.json', encoding='utf-8') as js:
             rozvrh = json.load(js)
         hors = rozvrh['Hours']
-        utimes = []
-        uhours = []
+        print(hors)
+        utimes, uhours = [], []
         for i, h in enumerate(hors):
             if i == 0:
-                utimes.append(datetime.strptime(h["BeginTime"], "%H:%M"))
+                utimes.append(datetime.strptime(h["BeginTime"], "%H:%M")-timedelta(minutes=60))
+                uhours.append(0)
+                utimes.append(datetime.strptime(h["BeginTime"], "%H:%M") - timedelta(minutes=10))
                 uhours.append(0)
             utimes.append(datetime.strptime(h["EndTime"], "%H:%M"))
-            uhours.append(i)
-
-        last_update = datetime(2022, 1, 1, 0, 0, 0, 0)
+            uhours.append(int(h["Caption"]))
+        print(uhours)
+        print(utimes)
+        last_update = datetime(2022, 1, 1)
         quick_sleep = 0
         sleep_time = 10  # seconds
 
@@ -95,12 +97,13 @@ class Magic:
             if self.cast_now:
                 last_update = datetime(2022, 1, 1, 0, 0, 0, 0)
             for uhour, utime in zip(reversed(uhours), reversed(utimes)):
+                print(uhour)
                 tupdate = datetime.combine(tnow.date(), datetime.time(utime))
                 ldt = dt_sec(last_update, tupdate)
                 adt = dt_sec(tnow, tupdate)
                 if adt * ldt < 0:
                     print(f'\tupdate = {tupdate.time()} \tdt = {adt} \tldt = {ldt}')
-                    self._the_magic(uhour, self.week, self.URL)  # handle exceptions!!
+                    self._the_magic(uhour)  # handle exceptions!!
                     last_update = tnow
                     self.cast_now = False
                     break
@@ -118,23 +121,23 @@ class Magic:
             if not self.running:
                 break
 
-    def _the_magic(self, hour, day, URL):
+    def _the_magic(self, hour):
         """
         day: week around this day will show up
         """
         max_hour = 9
-        refresh_access_token(URL)
-        week0 = day.isocalendar().week
+        refresh_access_token(self.URL)
+        week0 = self.week.isocalendar().week
         week1 = datetime.now().isocalendar().week
         if week0 != week1:
             dow = 5  # set the day of the week to saturday, so that no hour is highlighted
         else:
             dow = datetime.now().weekday()
-        get_current_timetable(day, URL)
+        get_current_timetable(self.week, self.URL)
 
         width, height = generate_html(dow, hour, max_hour)
 
         # html_img(width, height)
 
         get_set_wallpaper(width, height, self.size)
-        _throw_notif(day, hour, week0 - week1)
+        _throw_notif(self.week, hour, week0 - week1)

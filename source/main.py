@@ -160,7 +160,7 @@ if __name__ == '__main__':
                'lb_week': ttk.Label(f3, text='Aktuální týden'),
                'bt_update': ttk.Button(f3, text='Obnovit'),
                'lb_size': ttk.Label(f4, text='Velikost rozvrhu'),
-               'sc_size': ttk.Scale(f4, from_=0.2, to=0.9, orient=tk.HORIZONTAL)
+               'sc_size': ttk.Scale(f4, from_=0.2, to=0.6, orient=tk.HORIZONTAL)
                # 'cb_size': ttk.Combobox(f4, state="readonly", width=6)
                }
 
