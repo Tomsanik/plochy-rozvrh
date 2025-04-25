@@ -143,6 +143,8 @@ def generate_html(day, hour, max_item: int = 9):
 
             if h['Theme'] == "":
                 sub += '*'
+            if h['IsLastRoomLesson'] == 'true':
+                rom += '+'
             html += new_item(sub, grp, rom, typ=typ)
 
     html += '''                        </div>
