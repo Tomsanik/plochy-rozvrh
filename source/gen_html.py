@@ -77,15 +77,16 @@ def generate_html(day, hour, max_item: int = 9):
 
     days_count = len(days)
     for d in days:
-        hodiny = d['Atoms']
-        if len(hodiny) == 0:
-            # for i in range(3, 13, 1):
-            #     html += new_item('', '', '', '0')
-            days_count += -1
-            continue
         nt = d['Date'].find('T')
         dt = datetime.strptime(d['Date'][:nt], '%Y-%m-%d')
         html += new_day(d['DayOfWeek'], dt.strftime('%d. %m'))
+
+        hodiny = d['Atoms']
+        # if len(hodiny) == 0:
+        #     for i in range(3, max_item, 1):
+        #         html += new_item(d['DayDescription'], '', '', '0')
+        #     # days_count += -1
+        #     continue
 
         i = 3
         for i in range(3, max_item + 3, 1):

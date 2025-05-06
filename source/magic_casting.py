@@ -97,7 +97,7 @@ class Magic:
             if self.cast_now:
                 last_update = datetime(2022, 1, 1, 0, 0, 0, 0)
             for uhour, utime in zip(reversed(uhours), reversed(utimes)):
-                print(uhour)
+                # print(uhour)
                 tupdate = datetime.combine(tnow.date(), datetime.time(utime))
                 ldt = dt_sec(last_update, tupdate)
                 adt = dt_sec(tnow, tupdate)

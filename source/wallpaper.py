@@ -7,30 +7,28 @@ from PIL import Image
 from html2image import Html2Image
 
 
-def get_set_wallpaper_new(width, height, size):
-    user32 = ctypes.windll.user32
-    user32.SetProcessDPIAware()
-    # screen size
-    sw, sh = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
-
-    PATH = os.getcwd()
-    wallp = Image.open(os.path.join(PATH, 'wallpaper.jpg'))
-    ww, wh = wallp.size
-    img = wallp.load()
-
-    print(sw, sh, ww, wh)
-
-    if sw > sh:
-        i = int(sw-ww)/2
-
-
+# def get_set_wallpaper_new(width, height, size):
+#     user32 = ctypes.windll.user32
+#     user32.SetProcessDPIAware()
+#     # screen size
+#     sw, sh = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
+#
+#     PATH = os.getcwd()
+#     wallp = Image.open(os.path.join(PATH, 'wallpaper.jpg'))
+#     ww, wh = wallp.size
+#     img = wallp.load()
+#
+#     print(sw, sh, ww, wh)
+#
+#     if sw > sh:
+#         i = int(sw-ww)/2
 
 def get_set_wallpaper(width, height, size):
-    import ctypes
+    print('gsw:', width, height)
     user32 = ctypes.windll.user32
     user32.SetProcessDPIAware()
     sw, sh = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
-    print(sw, sh)
+    print('screensize:', sw, sh)
 
     """It just does what it is supposed to do"""
     PATH = os.getcwd()
