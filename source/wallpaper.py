@@ -23,14 +23,11 @@ from html2image import Html2Image
 #     if sw > sh:
 #         i = int(sw-ww)/2
 
-def get_set_wallpaper(width, height, size):
-    print('gsw:', width, height)
-    user32 = ctypes.windll.user32
-    user32.SetProcessDPIAware()
-    sw, sh = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
-    print('screensize:', sw, sh)
-
+def get_set_wallpaper_old(width, height, size):
     """It just does what it is supposed to do"""
+    user32 = ctypes.windll.user32
+    sw, sh = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+
     PATH = os.getcwd()
     wallp = Image.open(os.path.join(PATH, 'wallpaper.jpg'))
     wpw, wph = wallp.size
@@ -52,6 +49,7 @@ def get_set_wallpaper(width, height, size):
     hti.size = screenshot_size
 
     print(screenshot_size)
+    hti.browser.use_new_headless = None
     hti.screenshot(html_str=html,
                    css_file=os.path.join(PATH, 'source', 'rozvrh.css'),
                    save_as='page.png')
@@ -81,3 +79,58 @@ def get_set_wallpaper(width, height, size):
     # print('set wp: ', PATH)
 
     ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, PATH, 3)
+
+
+def get_set_wallpaper(width, height, size):
+    """It just does (not do) what it is supposed to do"""
+    BACK_COLOR = 'ACACAC'
+    PATH = os.getcwd()
+    wallp = Image.open(os.path.join(PATH, 'wallpaper.jpg'))
+    wpw, wph = wallp.size
+
+    user32 = ctypes.windll.user32
+    sw, sh = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+
+    if wpw / wph > sw / sh:
+        wpw2 = sw / sh * wph
+        sc_x0 = (wpw - wpw2)/2
+        wpw = wpw2
+
+    # create image from html
+    zoom = round(wpw * size / width, 2)  # size = fraction of wallpaper width taken by timetable
+    # print(wpw, size, width, zoom)
+    # print((width, height))
+
+    with open(os.path.join(PATH, 'assets', 'rozvrh.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.format(now=time.strftime("%H:%M:%S", time.localtime()), zoom=zoom)
+
+    hti = Html2Image(custom_flags=['--default-background-color='+BACK_COLOR, '--hide-scrollbars'],
+                     output_path=os.path.join(PATH, 'assets'))
+    hti.browser.use_new_headless = None
+    # hti.browser.print_command = True
+    hti.screenshot(html_str=html,
+                   css_file=os.path.join(PATH, 'source', 'rozvrh.css'),
+                   save_as='page.png')
+    print(f"Screenshot saved to {'./page.png'}")
+
+    PATH += '\\assets'
+    rozv = Image.open(PATH + '\\page.png')
+
+    imgmap = wallp.load()
+    width = round(zoom * width)
+    height = round(zoom * height)
+    x0w = wpw * 0.99 - width+sc_x0
+    y0w = wph * 0.92 - height
+    back_color = tuple(int(BACK_COLOR[i:i + 2], 16) for i in (0, 2, 4))
+    for x in range(width+20):
+        for y in range(height+20):
+            pxl = rozv.getpixel((x, y))
+            if pxl != back_color:
+                imgmap[x0w + x, y0w + y] = pxl
+
+    wallp.save(PATH + "\\final.png")
+
+    PATH += '\\final.png'
+    ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH, 3)
+
