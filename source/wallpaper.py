@@ -91,6 +91,7 @@ def get_set_wallpaper(width, height, size):
     user32 = ctypes.windll.user32
     sw, sh = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 
+    sc_x0 = 0
     if wpw / wph > sw / sh:
         wpw2 = sw / sh * wph
         sc_x0 = (wpw - wpw2)/2
