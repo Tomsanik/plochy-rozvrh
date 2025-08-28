@@ -85,6 +85,10 @@ def logout(_event):
     widgets['cb_munic'].config(state='enabled')
     widgets['cb_school'].config(state='enabled')
     widgets['en_url'].config(state='enabled')
+    lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), widgets['en_url'].get(), widgets['en_uname'].get(),
+             widgets['sc_size'].get()]
+    with open(PATH + '\\assets\\last_login.txt', 'w') as ff:
+        ff.write('\n'.join(map(str, lines)))
 
 
 def update_now(_event):
