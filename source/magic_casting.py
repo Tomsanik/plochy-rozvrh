@@ -6,23 +6,29 @@ import time
 from communication import get_current_timetable, refresh_access_token
 from gen_html import generate_html
 from wallpaper import get_set_wallpaper
-from win10toast import ToastNotifier
+from win11toast import toast
 import json
 
 
-def _throw_notif(day, hour, dweek):     # predelat na win11toast!!
+def _throw_notif(day, hour, dweek):
+    print('ready to toast')
     if dweek != 0:
         note = 'Zobrazuji rozvrh na den {}'
         note.format(day.strftime('%d. %m. %Y'))
     else:
         note = f'Následuje {hour + 1}. hodina'
-    toast = ToastNotifier()
-    toast.show_toast(
-        title="Tapeta s rozvrhem obnovena",
-        msg=note,
-        duration=3,
-        icon_path="source\\bakalari.ico",
-        threaded=True)
+    import os
+    cwd = os.getcwd()
+    toast("Tapeta s rozvrhem obnovena", note,
+          duration='short', icon=os.path.join(cwd, 'source', 'bakalari.ico'))
+    print('toasted')
+#    toast = ToastNotifier()
+#    toast.show_toast(
+#        title="Tapeta s rozvrhem obnovena",
+#        msg=note,
+#        duration=3,
+#        icon_path="source\\bakalari.ico",
+#        threaded=True)
 
 
 class Magic:

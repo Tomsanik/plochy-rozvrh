@@ -1,4 +1,4 @@
-import win32crypt
+from pypiwin32 import win32crypt
 import binascii
 
 

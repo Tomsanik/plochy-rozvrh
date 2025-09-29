@@ -1,2 +1,2 @@
 echo off
-start venv\Scripts\pythonw.exe source\main.py
+start venv\Scripts\python.exe source\main.py

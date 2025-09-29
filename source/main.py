@@ -9,7 +9,7 @@ from PIL import Image
 from communication import get_tokens, get_municipalities, get_schools
 from magic_casting import Magic
 from datetime import datetime
-import psswd
+# import psswd
 
 
 def set_text(entry, text):
@@ -67,7 +67,7 @@ def login(_event):
              widgets['sc_size'].get()]
     with open(PATH + '\\assets\\last_login.txt', 'w') as ff:
         ff.write('\n'.join(map(str, lines)))
-    psswd.encrypt_psswd(name, pswd, psswd_filename)
+    # psswd.encrypt_psswd(name, pswd, psswd_filename)
 
 
 def logout(_event):
@@ -236,10 +236,10 @@ if __name__ == '__main__':
 
     root.protocol('WM_DELETE_WINDOW', withdraw_window)
 
-    if os.path.isfile(psswd_filename):
-        u, p = psswd.decrypt_psswd(psswd_filename)
-        widgets['en_uname'].insert(0, u)
-        widgets['en_psswd'].insert(0, p)
-        login(None)
+    # if os.path.isfile(psswd_filename):
+    #     u, p = psswd.decrypt_psswd(psswd_filename)
+    #     widgets['en_uname'].insert(0, u)
+    #     widgets['en_psswd'].insert(0, p)
+    #     login(None)
 
     root.mainloop()
