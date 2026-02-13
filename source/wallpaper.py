@@ -6,6 +6,15 @@ import time
 from PIL import Image
 from html2image import Html2Image
 
+def delta():
+    from datetime import date
+    d1 = date(2025, 9, 1)
+    d2 = date(2026, 6, 30)
+    dt1 = d2 - d1
+    dt2 = date.today() - d1
+    # napocitat volne dny pred a po .today()
+    dt = dt2.days/dt1.days
+    return round(dt*100, 2)
 
 # def get_set_wallpaper_new(width, height, size):
 #     user32 = ctypes.windll.user32
@@ -39,7 +48,8 @@ def get_set_wallpaper_old(width, height, size):
     height = round(zoom * (height - 5))
     with open(os.path.join(PATH, 'assets', 'rozvrh.html'), encoding='utf-8') as f:
         html = f.read()
-    html = html.format(now=time.strftime("%H:%M:%S", time.localtime()), zoom=zoom)
+    print('\n {str(delta)} % \n \n')
+    html = html.format(now=time.strftime("%H:%M:%S", time.localtime()), zoom=zoom, delta=str(delta)+'%')
 
     x0r, y0r = round(8 * zoom*1.25), round(8 * zoom*1.25)
     width = round(width*1.25)
@@ -104,7 +114,7 @@ def get_set_wallpaper(width, height, size):
 
     with open(os.path.join(PATH, 'assets', 'rozvrh.html'), encoding='utf-8') as f:
         html = f.read()
-    html = html.format(now=time.strftime("%H:%M:%S", time.localtime()), zoom=zoom)
+    html = html.format(now=time.strftime("%H:%M:%S", time.localtime()), zoom=zoom, delta=delta)
 
     hti = Html2Image(custom_flags=['--default-background-color='+BACK_COLOR, '--hide-scrollbars'],
                      output_path=os.path.join(PATH, 'assets'))

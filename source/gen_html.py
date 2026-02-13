@@ -16,11 +16,16 @@ def generate_html(day, hour, max_item: int = 9):
         return add
 
     def new_hour(n, times):
-        add = '''               <div class="hours">
+        if n == '%delta':
+            add = '''               <div class="hours">
+                                <div class="hours-title">{delta}</div>
+                            </div>\n'''
+        else:
+            add = '''               <div class="hours">
                     <div class="hours-title">{}</div>
                     <div class="hours-time">{}</div>
                 </div>\n'''
-        add = add.format(n, times)
+            add = add.format(n, times)
         return add
 
     def new_day(n, date=None):
@@ -66,7 +71,7 @@ def generate_html(day, hour, max_item: int = 9):
                 <div class="main-grid" id="main-grid">\n'''
     # html = html.format(zoom=zoom)
 
-    html += new_hour('', '')
+    html += new_hour('%delta', '')
 
     for hh in hors:
         if int(hh['Caption']) < 1:
@@ -144,8 +149,8 @@ def generate_html(day, hour, max_item: int = 9):
 
             if h['Theme'] == "":
                 sub += '*'
-            if h['IsLastRoomLesson'] == 'true':
-                rom += '+'
+            # if h['IsLastRoomLesson'] == 'true':
+            #     rom += '+'
             html += new_item(sub, grp, rom, typ=typ)
 
     html += '''                        </div>

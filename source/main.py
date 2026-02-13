@@ -2,6 +2,7 @@
 import os
 import ctypes
 import tkinter as tk
+import json
 from tkinter import ttk
 from tkcalendar import DateEntry
 from pystray import MenuItem, Icon
@@ -9,7 +10,7 @@ from PIL import Image
 from communication import get_tokens, get_municipalities, get_schools
 from magic_casting import Magic
 from datetime import datetime
-# import psswd
+import psswd
 
 
 def set_text(entry, text):
@@ -19,7 +20,6 @@ def set_text(entry, text):
 
 def withdraw_window(_event=None):
     """Window closes to system tray if update thread is running"""
-
     def show_window(icon1, _item1):
         icon1.stop()
         root.after(0, root.deiconify)
@@ -63,11 +63,11 @@ def login(_event):
     widgets['cb_munic'].config(state='disabled')
     widgets['cb_school'].config(state='disabled')
     widgets['en_url'].config(state='disabled')
-    lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), url, widgets['en_uname'].get(),
-             widgets['sc_size'].get()]
-    with open(PATH + '\\assets\\last_login.txt', 'w') as ff:
-        ff.write('\n'.join(map(str, lines)))
-    # psswd.encrypt_psswd(name, pswd, psswd_filename)
+    to_save = {'url': url, 'name': widgets['en_uname'].get(), 'scale': widgets['sc_size'].get()}
+    with open(PATH + '\\assets\\last_login.txt', 'w', encoding="utf-8") as ff:
+        json.dump(to_save, ff)
+    psswd.encrypt_psswd(name, pswd)
+    widgets['en_psswd'].insert(0, "ani_prdlajs")
 
 
 def logout(_event):
@@ -85,10 +85,10 @@ def logout(_event):
     widgets['cb_munic'].config(state='enabled')
     widgets['cb_school'].config(state='enabled')
     widgets['en_url'].config(state='enabled')
-    lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), widgets['en_url'].get(), widgets['en_uname'].get(),
-             widgets['sc_size'].get()]
-    with open(PATH + '\\assets\\last_login.txt', 'w') as ff:
-        ff.write('\n'.join(map(str, lines)))
+    # lines = [widgets['cb_munic'].get(), widgets['cb_school'].get(), widgets['en_url'].get(), widgets['en_uname'].get(),
+    #          widgets['sc_size'].get()]
+    # with open(PATH + '\\assets\\last_login.txt', 'w') as ff:
+    #     ff.write('\n'.join(map(str, lines)))
 
 
 def update_now(_event):
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     if not os.path.exists(PATH + '\\source'):
         os.chdir('../')
         PATH = os.getcwd()
-    psswd_filename = 'assets\\pssdw.xml'
+    # psswd_filename = 'assets\\pssdw.xml'
 
     magic = Magic()
     urls = []
@@ -223,16 +223,22 @@ if __name__ == '__main__':
     # widgets['cb_size'].set('40%')
     # widgets['cb_size'].pack(expand=True, side=tk.LEFT)
 
-    if os.path.isfile(psswd_filename):
-        f = open(PATH + '\\assets\\last_login.txt')
-        loaded = f.read().splitlines()
-        if len(loaded) == 5:
-            widgets['en_url'].insert(0, loaded[2])
-            widgets['cb_school'].set(loaded[1])
-            widgets['cb_munic'].set(loaded[0])
-            # widgets['en_uname'].insert(0, loaded[3])
-            widgets['sc_size'].set(float(loaded[4]))
+    try:
+    # if os.path.isfile('assets\\last_login.txt'):
+        with open('assets\\last_login.txt', 'r', encoding="utf-8") as f:
+            loaded = json.load(f)
+        if len(loaded) == 3:
+            password = psswd.decrypt_psswd(loaded["name"])
+            widgets['en_url'].insert(0, loaded["url"])
+            widgets['en_uname'].insert(0, loaded["name"])
+            widgets['en_psswd'].insert(0, password)
+            del password
+            widgets['sc_size'].set(float(loaded["scale"]))
             widgets['en_uname'].focus_set()
+            login(None)
+    except FileNotFoundError:
+        print('Přihlašovací údaje dosud neuloženy, předkládám prázdný formulář.')
+
 
     root.protocol('WM_DELETE_WINDOW', withdraw_window)
 

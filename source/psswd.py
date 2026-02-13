@@ -1,8 +1,15 @@
-from pypiwin32 import win32crypt
+# from pypiwin32 import win32crypt
 import binascii
+import keyring
 
 
-def encrypt_psswd(username, password, filename):
+def encrypt_psswd(name, password):
+    keyring.set_password("plozvrh", name, password)
+
+def decrypt_psswd(name):
+    return keyring.get_password("plozvrh", name)
+
+def encrypt_psswd_old(username, password, filename):
     # encrypt the password with DPAPI.
     crypted_password = win32crypt.CryptProtectData(
         password.encode(), None, None, None, None, 0
@@ -29,7 +36,7 @@ def encrypt_psswd(username, password, filename):
         f.write(xml)
 
 
-def decrypt_psswd(filename):
+def decrypt_psswd_old(filename):
 
     with open(filename, "r", encoding="utf-8") as f:
         xml = f.read()
